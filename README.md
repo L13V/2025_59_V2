@@ -9,3 +9,5 @@
 - Better Organization
 
 # `Goon.`
+
+![Goon](https://i.ytimg.com/vi/WePNs-G7puA/hq720.jpg)
