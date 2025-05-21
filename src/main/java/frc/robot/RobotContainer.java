@@ -4,13 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -24,6 +17,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorState;
 
 import java.io.File;
+
 import swervelib.SwerveInputStream;
 
 /**
@@ -93,12 +87,7 @@ public class RobotContainer {
    * Flight joysticks}.
    */
   private void configureBindings() {
-    Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
-    Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
-        driveDirectAngle);
-
 
     if (RobotBase.isSimulation()) {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -108,7 +97,7 @@ public class RobotContainer {
 
     if (Robot.isSimulation()) {
       // Pose2d target = new Pose2d(new Translation2d(1, 4),
-      //     Rotation2d.fromDegrees(90));
+      // Rotation2d.fromDegrees(90));
       // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
 
       // driverXbox.b().whileTrue(
@@ -117,27 +106,15 @@ public class RobotContainer {
       // );
 
     }
-    if (DriverStation.isTest()) {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().onTrue(m_elevator.moveTo(ElevatorState.L4));
-      // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.leftBumper().onTrue(Commands.none());
+    driverXbox.y().onTrue(m_elevator.moveTo(ElevatorState.L4));
+    driverXbox.a().onTrue(m_elevator.moveTo(ElevatorState.L2));
+    driverXbox.b().and(() -> m_elevator.readyToStow()).onTrue(m_elevator.moveTo(ElevatorState.STOW));
 
-      driverXbox.rightBumper().onTrue(Commands.none());
-    } else {
-      driverXbox.y().onTrue(m_elevator.moveTo(ElevatorState.L4));
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
-    }
+    driverXbox.start().whileTrue(Commands.none());
+    driverXbox.back().whileTrue(Commands.none());
+    driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    driverXbox.rightBumper().onTrue(Commands.none());
 
   }
 
