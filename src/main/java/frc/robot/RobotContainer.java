@@ -20,6 +20,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem.ElevatorState;
+
 import java.io.File;
 import swervelib.SwerveInputStream;
 
@@ -37,6 +40,7 @@ public class RobotContainer {
   final CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -117,12 +121,16 @@ public class RobotContainer {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverXbox.y().onTrue(m_elevator.moveTo(ElevatorState.L4));
       // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
       driverXbox.leftBumper().onTrue(Commands.none());
+      driverXbox.leftBumper().onTrue(Commands.none());
+
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
+      driverXbox.y().onTrue(m_elevator.moveTo(ElevatorState.L4));
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
