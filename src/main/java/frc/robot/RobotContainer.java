@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem.ElevatorState;
+import frc.robot.subsystems.EndEvatorSubsystem;
+import frc.robot.subsystems.EndEvatorSubsystem.ElevatorState;
 
 import java.io.File;
 
@@ -34,7 +34,7 @@ public class RobotContainer {
   final CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+  private final EndEvatorSubsystem m_endevator = new EndEvatorSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -107,9 +107,9 @@ public class RobotContainer {
 
     }
 
-    driverXbox.y().onTrue(m_elevator.moveTo(ElevatorState.L4));
-    driverXbox.a().onTrue(m_elevator.moveTo(ElevatorState.L2));
-    driverXbox.b().and(() -> m_elevator.readyToStow()).onTrue(m_elevator.moveTo(ElevatorState.STOW));
+    driverXbox.y().onTrue(m_endevator.moveTo(ElevatorState.L4));
+    driverXbox.a().onTrue(m_endevator.moveTo(ElevatorState.L2));
+    driverXbox.b().and(() -> m_endevator.readyToStow()).onTrue(m_endevator.moveTo(ElevatorState.STOW));
 
     driverXbox.start().whileTrue(Commands.none());
     driverXbox.back().whileTrue(Commands.none());
