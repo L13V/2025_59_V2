@@ -84,36 +84,36 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public void periodic() {
         switch (state) {
             case L1 -> {
-                System.out.println("L1");
+                // System.out.println("L1");
                 test_motor.set(0.1);
             }
             case L2 -> {
-                System.out.println("L2");
+                // System.out.println("L2");
                 test_motor.set(-0.2);
             }
             case L3 -> {
-                System.out.println("L3");
+                // System.out.println("L3");
                 test_motor.set(0.3);
             }
             case L4 -> {
-                System.out.println("L4");
+                // System.out.println("L4");
                 test_motor.set(-0.4);
 
             }
             case L4_Score -> {
-                System.out.println("L4_Score");
+                // System.out.println("L4_Score");
                 test_motor.set(0.5);
             }
             case STOW -> {
-                System.out.println("STOW");
+                // System.out.println("STOW");
                 test_motor_closed.setReference(100,SparkBase.ControlType.kVelocity);
 
             }
             case FLOOR_INTAKE -> {
-                System.out.println("FLOOR");
+                // System.out.println("FLOOR");
             }
             case BARGE -> {
-                System.out.println("BARGE");
+                // System.out.println("BARGE");
             }
 
         }

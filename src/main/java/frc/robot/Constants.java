@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -19,18 +21,16 @@ import swervelib.math.Matter;
 public final class Constants
 {
 
-  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
+  public static final double ROBOT_MASS = (110) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-  public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-  // Maximum speed of the robot in meters per second, used to limit acceleration.
+  public static final double LOOP_TIME  = 0.05; //s, 20ms + 110ms sprk max velocity lag
+  public static final double MAX_SPEED  = Units.feetToMeters(19.8);
+  public static final double ALIGN_KP   = 0.005;
+  public static final boolean isCompetition = true;
 
-//  public static final class AutonConstants
-//  {
-//
-//    public static final PIDConstants TRANSLATION_PID = new PIDConstants(0.7, 0, 0);
-//    public static final PIDConstants ANGLE_PID       = new PIDConstants(0.4, 0, 0.01);
-//  }
+  public static final Transform2d leftbranchrobotoffset = new Transform2d(Units.inchesToMeters(-10),Units.inchesToMeters(6),Rotation2d.kZero);
+  public static final Transform2d rightbranchrobotoffset = new Transform2d(Units.inchesToMeters(-10),Units.inchesToMeters(-6),Rotation2d.kZero);
+
 
   public static final class DrivebaseConstants
   {
@@ -43,13 +43,33 @@ public final class Constants
   {
 
     // Joystick Deadband
-    public static final double DEADBAND        = 0.1;
-    public static final double LEFT_Y_DEADBAND = 0.1;
-    public static final double RIGHT_X_DEADBAND = 0.1;
+    public static final double DEADBAND        = 0.035;
+    public static final double LEFT_Y_DEADBAND = 0.035;
+    public static final double RIGHT_X_DEADBAND = 0.035;
     public static final double TURN_CONSTANT    = 6;
   }
 
-  public static class ElevatorClonstants{
+  public static class ClimbConstants {
+    public static final int climb_motor_id = 62;
+    public static final double climb_stow_position = 1.55;
+    public static final double climb_deployed_position = 3.5;
+    public static final double climb_climbing_limit = 0.4;
+  }
+
+  public static class BallIntakeConstants { //bi is Ball Intake
+    // Motor IDs
+    public static final int bi_roller_motor_id = 59;
+    public static final int bi_pivot_motor_id = 60;
+    // Sensor IDS
+    public static final int bi_range_id = 57;
+    // Positions
+    public static final double bi_stow_position = 65; // No Ball
+    public static final double bi_algae_intake_position = 132;
+    public static final double bi_algae_stow_position = 100;
+    public static final double bi_algae_score_position = 80;
+    public static final double bi_climb_position = 182;
+  }
+  public static class EndevatorConstants{
     
   }
 
