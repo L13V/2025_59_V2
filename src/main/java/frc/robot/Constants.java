@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -11,42 +16,44 @@ import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This
- * class should not be used for any other purpose. All constants should be declared globally (i.e. public static). Do
+ * The Constants class provides a convenient place for teams to hold robot-wide
+ * numerical or boolean constants. This
+ * class should not be used for any other purpose. All constants should be
+ * declared globally (i.e. public static). Do
  * not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes)
+ * wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants
-{
+public final class Constants {
 
   public static final double ROBOT_MASS = (110) * 0.453592; // 32lbs * kg per pound
-  public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-  public static final double LOOP_TIME  = 0.05; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(19.8);
-  public static final double ALIGN_KP   = 0.005;
+  public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+  public static final double LOOP_TIME = 0.05; // s, 20ms + 110ms sprk max velocity lag
+  public static final double MAX_SPEED = Units.feetToMeters(19.8);
+  public static final double ALIGN_KP = 0.005;
   public static final boolean isCompetition = true;
 
-  public static final Transform2d leftbranchrobotoffset = new Transform2d(Units.inchesToMeters(-10),Units.inchesToMeters(6),Rotation2d.kZero);
-  public static final Transform2d rightbranchrobotoffset = new Transform2d(Units.inchesToMeters(-10),Units.inchesToMeters(-6),Rotation2d.kZero);
+  public static final Transform2d leftbranchrobotoffset = new Transform2d(Units.inchesToMeters(-10),
+      Units.inchesToMeters(6), Rotation2d.kZero);
+  public static final Transform2d rightbranchrobotoffset = new Transform2d(Units.inchesToMeters(-10),
+      Units.inchesToMeters(-6), Rotation2d.kZero);
 
-
-  public static final class DrivebaseConstants
-  {
+  public static final class DrivebaseConstants {
 
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
 
-  public static class OperatorConstants
-  {
+  public static class OperatorConstants {
 
     // Joystick Deadband
-    public static final double DEADBAND        = 0.035;
+    public static final double DEADBAND = 0.035;
     public static final double LEFT_Y_DEADBAND = 0.035;
     public static final double RIGHT_X_DEADBAND = 0.035;
-    public static final double TURN_CONSTANT    = 6;
+    public static final double TURN_CONSTANT = 6;
   }
 
   public static class ClimbConstants {
@@ -56,7 +63,7 @@ public final class Constants
     public static final double climb_climbing_limit = 0.4;
   }
 
-  public static class BallIntakeConstants { //bi is Ball Intake
+  public static class BallIntakeConstants { // bi is Ball Intake
     // Motor IDs
     public static final int bi_roller_motor_id = 59;
     public static final int bi_pivot_motor_id = 60;
@@ -69,8 +76,86 @@ public final class Constants
     public static final double bi_algae_score_position = 80;
     public static final double bi_climb_position = 182;
   }
-  public static class EndevatorConstants{
-    
+
+  public static class EndevatorConstants {
+    // Can IDs
+    public static final int endeffector_cancoder_id = 50;
+    public static final int endeffector_pivot_motor_id = 52;
+    public static final int elevator_motor_id = 51;
+
+    // Motor Configurations
+    // Endeffector Pivot
+    public static final double pivot_sensor_to_mechanism_ratio = 0.0057199999;
+    public static final double pivot_rotor_to_sensor_ratio = 1; // 1/23.36
+    // Elevator Motor
+    public static final double elevator_sensor_to_mechanism_ratio = 0.715;
+    public static final double elevator_rotor_to_sensor_ratio = 1; // 1/23.36
+    public static final double elevator_velocity_constant = 3500;
+    public static final double elevator_acceleration_constant = 2000;
+    public static final double elevator_jerk_constant = 25000;
+    public static final double elevator_kS = 0;
+    public static final double elevator_kV = 1 / 3;
+    public static final double elevator_kA = 1 / 3;
+    public static final double elevator_kP = 0.07;
+    public static final double elevator_kI = 0.0;
+    public static final double elevator_kD = 0.0;
+
+    // Elevator Heights
+    // Stow
+    public static final double coral_stow_height = 18;
+    public static final double algae_stow_height = 22;
+    // Floor
+    public static final double coral_floor_pickup_height = 1;
+    public static final double algae_floor_pickup_height = 11.5;
+    // Barge
+    public static final double barge_height = 68.5;
+    // L4
+    public static final double L4_height = 57.5;
+    public static final double L4_auto_height = 56;
+    public static final double L4_score_height = 42.5;
+    public static final double L4_score_auto_height = 41.75;
+    public static final double L4_score_auto_lower_height = 30.5;
+    // L3
+    public static final double L3_height = 45.95;
+    public static final double algae_L3_height = 42.5;
+    // L2
+    public static final double L2_height = 29.88;
+    public static final double algae_L2_height = 27;
+    // L1
+    public static final double L1_height = 19.1;
+    // Coral Station
+    public static final double coral_station_auto_height = 24;
+    public static final double coral_station_tele_height = 23.5;
+    //Processor
+    public static final double algae_processor_height = 1.5;
+
+    // Endeffector Angles
+    // Stow
+    public static final int auto_coral_stow_angle = 35;
+    public static final int teleop_coral_stow_angle = 35;
+    public static final int algae_stow_angle = 66;
+    // Floor
+    public static final int coral_floor_angle = 125;
+    public static final int algae_floor_angle = 160;
+    // Barge
+    public static final int barge_angle = 25;
+    // L4
+    public static final int auto_L4_angle = 35;
+    public static final int teleop_L4_angle = 35;
+    // L3
+    public static final int coral_L3_angle = 125;
+    public static final int algae_L3_angle = 125;
+    // L2
+    public static final int coral_L2_angle = 125;
+    public static final int algae_L2_angle = 125;
+    // L1
+    public static final int coral_L1_angle = 125;
+    // Coral Station
+    public static final int auto_coral_station_angle = 73;
+    public static final int teleop_coral_station_angle = 69;
+    // Processor
+    public static final int algae_processor_angle = 125;
+
   }
 
 }
