@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -72,14 +73,14 @@ public final class Constants {
   }
 
   public static class EndevatorConstants {
-    /* 
+    /*
      * CAN IDs
      */
     public static final int endeffector_cancoder_id = 50;
     public static final int endeffector_pivot_motor_id = 52;
     public static final int elevator_motor_id = 51;
 
-    /* 
+    /*
      * Motor Configurations
      */
     // Endeffector Pivot
@@ -98,7 +99,7 @@ public final class Constants {
     public static final double elevator_kI = 0.0;
     public static final double elevator_kD = 0.0;
 
-    /* 
+    /*
      * Elevator heights
      */
     // Stow
@@ -126,10 +127,10 @@ public final class Constants {
     // Coral Station
     public static final double coral_station_auto_height = 24;
     public static final double coral_station_tele_height = 23.5;
-    //Processor
+    // Processor
     public static final double algae_processor_height = 1.5;
-    /* 
-     * Endeffector Angles 
+    /*
+     * Endeffector Angles
      */
     // Stow
     public static final int auto_coral_stow_angle = 35;
@@ -156,16 +157,51 @@ public final class Constants {
     public static final int teleop_coral_station_angle = 69;
     // Processor
     public static final int algae_processor_angle = 125;
-    /* 
+    /*
      * Antenna Servo
      */
-    public static final double antenna_reef_intake_limit  = 0.55; 
-    public static final double antenna_floor_intake_limit  = 0.6; 
-    public static final double antenna_home = 1; 
-    /* 
+    public static final double antenna_reef_intake_limit = 0.55;
+    public static final double antenna_floor_intake_limit = 0.6;
+    public static final double antenna_home = 1;
+    /*
      * Antenna Ball Detection
      */
     public static final double antenna_ball_detection_current = 11;
+  }
+
+  public static class CoralIntakeConstants {
+    /*
+     * CAN IDs
+     */
+    public static final int ci_left_motor_id = 53;
+    public static final int ci_top_motor_id = 54;
+    public static final int ci_right_motor_id = 55;
+    public static final int ci_endeffector_range_id = 56;
+    /*
+     * Powers for Various Tasks
+     */
+    // Idle
+    public static final double ci_idle_power = 0.125;
+    // Intaking
+    public static final double ci_coral_floor_intake_power = 0.5;
+    public static final double ci_coral_coral_station_intake_power = 0.65;
+    public static final double ci_algae_intake_power = -0.4; // Takes ball from reef
+    public static final double ci_algae_floor_intake_power = -1;
+    public static final double ci_algae_floor_intake_top_roller_power = 0.9;
+    // L1 Score
+    public static final double ci_L1_score_power = -0.1;
+    // L2 Score
+    public static final double ci_L2_score_power = -0.25;
+    // L3 Score
+    public static final double ci_L3_score_power = -0.25;
+    // L4 Score
+    public static final double ci_L4_score_outtake_power = 0.4;
+    // Barge Score
+    public static final double ci_teleop_barge_score_power = 1; // Outtake ball
+    public static final double ci_auto_barge_score_power = 0.75; // Outtake ball
+    // Processor Score
+    public static final double ci_processor_score_power = 0.4;
+
   }
 
 }
