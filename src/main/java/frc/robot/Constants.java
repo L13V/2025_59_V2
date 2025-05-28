@@ -3,12 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -78,12 +72,16 @@ public final class Constants {
   }
 
   public static class EndevatorConstants {
-    // Can IDs
+    /* 
+     * CAN IDs
+     */
     public static final int endeffector_cancoder_id = 50;
     public static final int endeffector_pivot_motor_id = 52;
     public static final int elevator_motor_id = 51;
 
-    // Motor Configurations
+    /* 
+     * Motor Configurations
+     */
     // Endeffector Pivot
     public static final double pivot_sensor_to_mechanism_ratio = 0.0057199999;
     public static final double pivot_rotor_to_sensor_ratio = 1; // 1/23.36
@@ -100,7 +98,9 @@ public final class Constants {
     public static final double elevator_kI = 0.0;
     public static final double elevator_kD = 0.0;
 
-    // Elevator Heights
+    /* 
+     * Elevator heights
+     */
     // Stow
     public static final double coral_stow_height = 18;
     public static final double algae_stow_height = 22;
@@ -128,8 +128,9 @@ public final class Constants {
     public static final double coral_station_tele_height = 23.5;
     //Processor
     public static final double algae_processor_height = 1.5;
-
-    // Endeffector Angles
+    /* 
+     * Endeffector Angles 
+     */
     // Stow
     public static final int auto_coral_stow_angle = 35;
     public static final int teleop_coral_stow_angle = 35;
@@ -155,7 +156,16 @@ public final class Constants {
     public static final int teleop_coral_station_angle = 69;
     // Processor
     public static final int algae_processor_angle = 125;
-
+    /* 
+     * Antenna Servo
+     */
+    public static final double antenna_reef_intake_limit  = 0.55; 
+    public static final double antenna_floor_intake_limit  = 0.6; 
+    public static final double antenna_home = 1; 
+    /* 
+     * Antenna Ball Detection
+     */
+    public static final double antenna_ball_detection_current = 11;
   }
 
 }
