@@ -41,7 +41,7 @@ public final class Constants {
     public static final double WHEEL_LOCK_TIME = 10; // seconds
     public static final double slow_multiplier = 0.33;
     public static final double normal_multiplier = 0.8;
-    
+
   }
 
   public static class OperatorConstants {
@@ -86,20 +86,38 @@ public final class Constants {
      * Motor Configurations
      */
     // Endeffector Pivot
-    public static final double pivot_sensor_to_mechanism_ratio = 0.0057199999;
-    public static final double pivot_rotor_to_sensor_ratio = 1; // 1/23.36
+    public static final double endeffector_sensor_to_mechanism_ratio = 0.00571999978274107;
+    public static final double endeffector_rotor_to_sensor_ratio = 1;
+    // slot0
+
+    public static final double endeffector_slot0_kP = 0.009499999694526196;
+    public static final double endeffector_slot0_kI = 0.0006000000284984708;
+    public static final double endeffector_slot0_kD = 0.0010000000474974513;
+    public static final double endeffector_slot0_kS = 0;
+    public static final double endeffector_slot0_kV = 0;
+    public static final double endeffector_slot0_kA = 0;
+    // slot1
+    public static final double endeffector_slot1_kP = 0.02500000037252903;
+    public static final double endeffector_slot1_kI = 0.003000000026077032;
+    public static final double endeffector_slot1_kD = 0.0010000000474974513;
+    public static final double endeffector_slot1_kS = 0;
+    public static final double endeffector_slot1_kV = 0;
+    public static final double endeffector_slot1_kA = 0;
+    // Other
+    public static final double endeffector_duty_cycle_closed_loop_ramp = 0.25;
+
     // Elevator Motor
     public static final double elevator_sensor_to_mechanism_ratio = 0.715;
     public static final double elevator_rotor_to_sensor_ratio = 1; // 1/23.36
     public static final double elevator_mm_cruise_velocity = 3500;
     public static final double elevator_mm_acceleration = 2000;
     public static final double elevator_mm_jerk = 9999;
-    public static final double elevator_kS = 0;
-    public static final double elevator_kV = 1 / 3;
-    public static final double elevator_kA = 1 / 3;
     public static final double elevator_kP = 0.07;
     public static final double elevator_kI = 0.0;
     public static final double elevator_kD = 0.0;
+    public static final double elevator_kS = 0;
+    public static final double elevator_kV = 1 / 3;
+    public static final double elevator_kA = 1 / 3;
 
     /*
      * Elevator heights

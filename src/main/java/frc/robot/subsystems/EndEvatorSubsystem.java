@@ -3,18 +3,29 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.EndevatorConstants;
 
 public class EndEvatorSubsystem extends SubsystemBase {
+    /*
+     * Elevator Motor
+     */
     static TalonFX elevator_motor = new TalonFX(EndevatorConstants.elevator_motor_id);
     static TalonFXConfiguration elevator_motor_config = new TalonFXConfiguration();
-    static ExternalFeedbackConfigs elevator_external_feedback = new ExternalFeedbackConfigs();
+    /*
+     * Endeffector pivot
+     */
+    static TalonFX endeffector_pivot = new TalonFX(EndevatorConstants.endeffector_pivot_motor_id);
+    static TalonFXConfiguration endeffector_pivot_config = new TalonFXConfiguration();
 
     // Required initialization crap
     public void initialize() {
@@ -40,10 +51,37 @@ public class EndEvatorSubsystem extends SubsystemBase {
         elevator_motor_config.MotionMagic.MotionMagicJerk = EndevatorConstants.elevator_mm_jerk;
         elevator_motor_config.Feedback.SensorToMechanismRatio = EndevatorConstants.elevator_sensor_to_mechanism_ratio;
         elevator_motor_config.Feedback.RotorToSensorRatio = EndevatorConstants.elevator_rotor_to_sensor_ratio;
-        elevator_motor.getConfigurator().apply(elevator_motor_config);
-        /* 
+        /*
          * Endeffector Motor Config
          */
+        endeffector_pivot.getConfigurator().refresh(endeffector_pivot_config);
+        endeffector_pivot_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        endeffector_pivot_config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        // Slot 0
+        endeffector_pivot_config.Slot0.kP = EndevatorConstants.endeffector_slot0_kP;
+        endeffector_pivot_config.Slot0.kI = EndevatorConstants.endeffector_slot0_kI;
+        endeffector_pivot_config.Slot0.kD = EndevatorConstants.endeffector_slot0_kD;
+        endeffector_pivot_config.Slot0.kA = EndevatorConstants.endeffector_slot0_kA;
+        endeffector_pivot_config.Slot0.kV = EndevatorConstants.endeffector_slot0_kV;
+        endeffector_pivot_config.Slot0.kS = EndevatorConstants.endeffector_slot0_kS;
+        // Slot 1
+        endeffector_pivot_config.Slot1.kP = EndevatorConstants.endeffector_slot1_kP;
+        endeffector_pivot_config.Slot1.kI = EndevatorConstants.endeffector_slot1_kI;
+        endeffector_pivot_config.Slot1.kD = EndevatorConstants.endeffector_slot1_kD;
+        endeffector_pivot_config.Slot1.kA = EndevatorConstants.endeffector_slot1_kA;
+        endeffector_pivot_config.Slot1.kV = EndevatorConstants.endeffector_slot1_kV;
+        endeffector_pivot_config.Slot1.kS = EndevatorConstants.endeffector_slot1_kS;
+        //Feedback
+        endeffector_pivot_config.Feedback.FeedbackRemoteSensorID = EndevatorConstants.endeffector_cancoder_id;
+        endeffector_pivot_config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        endeffector_pivot_config.Feedback.RotorToSensorRatio = EndevatorConstants.endeffector_rotor_to_sensor_ratio;
+        endeffector_pivot_config.Feedback.SensorToMechanismRatio = EndevatorConstants.endeffector_sensor_to_mechanism_ratio;
+        endeffector_pivot_config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = EndevatorConstants.endeffector_duty_cycle_closed_loop_ramp;
+        /* 
+         * Apply Configs
+         */
+        elevator_motor.getConfigurator().apply(elevator_motor_config);
+        endeffector_pivot.getConfigurator().apply(endeffector_pivot_config);
         System.out.println("ElevatorSubsystem Initialized");
     }
 
