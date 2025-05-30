@@ -71,13 +71,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
         endeffector_pivot_config.Slot1.kA = EndevatorConstants.endeffector_slot1_kA;
         endeffector_pivot_config.Slot1.kV = EndevatorConstants.endeffector_slot1_kV;
         endeffector_pivot_config.Slot1.kS = EndevatorConstants.endeffector_slot1_kS;
-        //Feedback
+        // Feedback
         endeffector_pivot_config.Feedback.FeedbackRemoteSensorID = EndevatorConstants.endeffector_cancoder_id;
         endeffector_pivot_config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         endeffector_pivot_config.Feedback.RotorToSensorRatio = EndevatorConstants.endeffector_rotor_to_sensor_ratio;
         endeffector_pivot_config.Feedback.SensorToMechanismRatio = EndevatorConstants.endeffector_sensor_to_mechanism_ratio;
         endeffector_pivot_config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = EndevatorConstants.endeffector_duty_cycle_closed_loop_ramp;
-        /* 
+        /*
          * Apply Configs
          */
         elevator_motor.getConfigurator().apply(elevator_motor_config);
