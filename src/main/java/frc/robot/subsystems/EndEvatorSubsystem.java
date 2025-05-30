@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -9,6 +10,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,11 +23,14 @@ public class EndEvatorSubsystem extends SubsystemBase {
      */
     static TalonFX elevator_motor = new TalonFX(EndevatorConstants.elevator_motor_id);
     static TalonFXConfiguration elevator_motor_config = new TalonFXConfiguration();
+    static PositionDutyCycle elevator_PositionDutyCycle0 = new PositionDutyCycle(0).withSlot(0);
     /*
      * Endeffector pivot
      */
     static TalonFX endeffector_pivot = new TalonFX(EndevatorConstants.endeffector_pivot_motor_id);
     static TalonFXConfiguration endeffector_pivot_config = new TalonFXConfiguration();
+    static PositionDutyCycle endeffector_PositionDutyCycle0 = new PositionDutyCycle(0).withSlot(0);
+    static PositionDutyCycle endeffector_PositionDutyCycle1 = new PositionDutyCycle(0).withSlot(1);
 
     // Required initialization crap
     public void initialize() {
@@ -85,6 +90,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
         System.out.println("ElevatorSubsystem Initialized");
     }
 
+    public double initial_endeffector_position = 0.0;
+
     // Initialize ElevatorState Enum, and start at stow
     public enum ElevatorState {
         L1,
@@ -101,54 +108,84 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public ElevatorState state = ElevatorState.STOW;
 
     /**
-     * Sets the elevator state machine to another state.
+     * FUNCTION for setting the elevator state machine to another state.
      * 
-     * @param setto
+     * @param setstateto
      */
-    public void setElevatorState(ElevatorState setto) {
-        state = setto;
+    public void setState(ElevatorState setstateto) {
+        initial_endeffector_position = getEndeffectorCurrentPosition();
+        state = setstateto;
+
     }
 
     /**
-     * Command for moving the elevator. Usually accessed by the controller, and
+     * COMMAND for moving the elevator. Usually accessed by the controller, and
      * eventually sets the state of the state machine.
      * 
-     * @param moveto
+     * @param setto
      * @return Command
      */
-    public Command moveTo(ElevatorState moveto) {
-        return runOnce(() -> setElevatorState(moveto));
+    public Command setTo(ElevatorState setto) {
+        return runOnce(() -> setState(setto));
+    }
+
+    public double getElevatorCurrentPosition() {
+        return elevator_motor.getPosition().getValueAsDouble();
+    }
+
+    public double getEndeffectorCurrentPosition() {
+        return endeffector_pivot.getPosition().getValueAsDouble();
     }
 
     // Checking State Machine States
-    public ElevatorState getCurrenElevatorState() {
+    public ElevatorState getCurrentState() {
         return state;
     }
 
     // Booleans
     public Boolean readyToStow() {
-        return getCurrenElevatorState() == (ElevatorState.L2);
+        return getCurrentState() == (ElevatorState.L2);
     }
 
     // State Machine Garbage
     public void periodic() {
         switch (state) {
             case L1 -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L1_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L1_angle));
             }
             case L2 -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L2_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L2_angle));
             }
             case L3 -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L3_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L3_angle));
+
             }
             case L4 -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L4_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
+
             }
             case L4_Score -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L4_score_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
             }
             case STOW -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.coral_stow_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_coral_stow_angle));
+                // elevator_motor.setControl(endeffector_PositionDutyCycle0)
             }
             case CORAL_FLOOR_INTAKE -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.coral_floor_pickup_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_floor_angle));
             }
             case ALGAE_FLOOR_INTAKE -> {
+                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.algae_floor_pickup_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.algae_floor_angle));
             }
+            
             case BARGE -> {
             }
 
