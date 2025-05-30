@@ -1,31 +1,20 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkMaxAlternateEncoder;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import frc.robot.Constants.EndevatorConstants;
 
 public class EndEvatorSubsystem extends SubsystemBase {
-    final SparkMax test_motor = new SparkMax(8, MotorType.kBrushless);
-    final ClosedLoopConfig test_motor_closed_loop_config = new ClosedLoopConfig().pidf(0, 0, 0, 0.0010905125408942202835332606325).feedbackSensor(FeedbackSensor.kPrimaryEncoder).velocityFF(0.0010905125408942202835332606325);
-    final SparkClosedLoopController test_motor_closed = test_motor.getClosedLoopController();
-    final SparkBaseConfig test_motor_config = new SparkMaxConfig().idleMode(IdleMode.kCoast).inverted(false).apply(test_motor_closed_loop_config);
-
-
+    static TalonFX elevator_motor = new TalonFX(EndevatorConstants.elevator_motor_id);
+    static TalonFXConfiguration elevator_motor_config = new TalonFXConfiguration();
+    static ExternalFeedbackConfigs elevator_external_feedback = new ExternalFeedbackConfigs();
 
     // Required initialization crap
     public void initialize() {
@@ -33,9 +22,29 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     }
 
-    public EndEvatorSubsystem() {
+    public EndEvatorSubsystem() { // Motor Configuration Apply-ings ig.\
+        /*
+         * Elevator Motor Config
+         */
+        elevator_motor.getConfigurator().refresh(elevator_motor_config); // Place current config in new config
+        elevator_motor_config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        elevator_motor_config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        elevator_motor_config.Slot0.kP = EndevatorConstants.elevator_kP;
+        elevator_motor_config.Slot0.kI = EndevatorConstants.elevator_kI;
+        elevator_motor_config.Slot0.kD = EndevatorConstants.elevator_kD;
+        elevator_motor_config.Slot0.kA = EndevatorConstants.elevator_kA;
+        elevator_motor_config.Slot0.kV = EndevatorConstants.elevator_kV;
+        elevator_motor_config.Slot0.kS = EndevatorConstants.elevator_kS;
+        elevator_motor_config.MotionMagic.MotionMagicCruiseVelocity = EndevatorConstants.elevator_mm_cruise_velocity;
+        elevator_motor_config.MotionMagic.MotionMagicAcceleration = EndevatorConstants.elevator_mm_acceleration;
+        elevator_motor_config.MotionMagic.MotionMagicJerk = EndevatorConstants.elevator_mm_jerk;
+        elevator_motor_config.Feedback.SensorToMechanismRatio = EndevatorConstants.elevator_sensor_to_mechanism_ratio;
+        elevator_motor_config.Feedback.RotorToSensorRatio = EndevatorConstants.elevator_rotor_to_sensor_ratio;
+        elevator_motor.getConfigurator().apply(elevator_motor_config);
+        /* 
+         * Endeffector Motor Config
+         */
         System.out.println("ElevatorSubsystem Initialized");
-        test_motor.configure(test_motor_config, ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     }
 
     // Initialize ElevatorState Enum, and start at stow
@@ -46,9 +55,11 @@ public class EndEvatorSubsystem extends SubsystemBase {
         L4,
         L4_Score,
         STOW,
-        FLOOR_INTAKE,
+        CORAL_FLOOR_INTAKE,
+        ALGAE_FLOOR_INTAKE,
         BARGE
     }
+
     public ElevatorState state = ElevatorState.STOW;
 
     /**
@@ -60,9 +71,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
         state = setto;
     }
 
-    
-    /** 
-     * Command for moving the elevator. Usually accessed by the controller, and eventually sets the state of the state machine.
+    /**
+     * Command for moving the elevator. Usually accessed by the controller, and
+     * eventually sets the state of the state machine.
+     * 
      * @param moveto
      * @return Command
      */
@@ -84,41 +96,26 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public void periodic() {
         switch (state) {
             case L1 -> {
-                // System.out.println("L1");
-                test_motor.set(0.1);
             }
             case L2 -> {
-                // System.out.println("L2");
-                test_motor.set(-0.2);
             }
             case L3 -> {
-                // System.out.println("L3");
-                test_motor.set(0.3);
             }
             case L4 -> {
-                // System.out.println("L4");
-                test_motor.set(-0.4);
-
             }
             case L4_Score -> {
-                // System.out.println("L4_Score");
-                test_motor.set(0.5);
             }
             case STOW -> {
-                // System.out.println("STOW");
-                test_motor_closed.setReference(100,SparkBase.ControlType.kVelocity);
-
             }
-            case FLOOR_INTAKE -> {
-                // System.out.println("FLOOR");
+            case CORAL_FLOOR_INTAKE -> {
+            }
+            case ALGAE_FLOOR_INTAKE -> {
             }
             case BARGE -> {
-                // System.out.println("BARGE");
             }
 
         }
         SmartDashboard.putString("State", state.toString());
         SmartDashboard.putBoolean("ReadyToStow", readyToStow());
-        SmartDashboard.putNumber("Current", test_motor.getAppliedOutput());
     }
 }

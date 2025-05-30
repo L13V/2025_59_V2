@@ -46,7 +46,7 @@ public class RobotContainer {
       () -> driverXbox.getLeftX() * -1)
       .withControllerRotationAxis(driverXbox::getRightX)
       .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
+      .scaleTranslation(drivebase.drivemultiplier)
       .allianceRelativeControl(true);
 
   /**
@@ -115,7 +115,7 @@ public class RobotContainer {
     driverXbox.start().whileTrue(Commands.none());
     driverXbox.back().whileTrue(Commands.none());
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-    driverXbox.rightBumper().onTrue(Commands.none());
+    driverXbox.rightBumper().onTrue(drivebase.goSlow()).onFalse(drivebase.goFast());
 
   }
 

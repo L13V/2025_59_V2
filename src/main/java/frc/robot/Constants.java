@@ -37,9 +37,11 @@ public final class Constants {
       Units.inchesToMeters(-6), Rotation2d.kZero);
 
   public static final class DrivebaseConstants {
-
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
+    public static final double slow_multiplier = 0.33;
+    public static final double normal_multiplier = 0.8;
+    
   }
 
   public static class OperatorConstants {
@@ -89,9 +91,9 @@ public final class Constants {
     // Elevator Motor
     public static final double elevator_sensor_to_mechanism_ratio = 0.715;
     public static final double elevator_rotor_to_sensor_ratio = 1; // 1/23.36
-    public static final double elevator_velocity_constant = 3500;
-    public static final double elevator_acceleration_constant = 2000;
-    public static final double elevator_jerk_constant = 25000;
+    public static final double elevator_mm_cruise_velocity = 3500;
+    public static final double elevator_mm_acceleration = 2000;
+    public static final double elevator_mm_jerk = 9999;
     public static final double elevator_kS = 0;
     public static final double elevator_kV = 1 / 3;
     public static final double elevator_kA = 1 / 3;
