@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.EndEvatorSubsystem;
-import frc.robot.subsystems.EndEvatorSubsystem.ElevatorState;
+import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 
 import java.io.File;
 
@@ -89,12 +89,12 @@ public class RobotContainer {
    * Flight joysticks}.
    */
   private void configureBindings() {
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
 
     if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     } else {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     }
 
     if (Robot.isSimulation()) {
@@ -109,10 +109,10 @@ public class RobotContainer {
 
     }
 
-    driverXbox.y().onTrue(m_endevator.setTo(ElevatorState.L1));
-    driverXbox.x().onTrue(m_endevator.setTo(ElevatorState.L2));
-    driverXbox.a().onTrue(m_endevator.setTo(ElevatorState.L3));
-    driverXbox.b().onTrue(m_endevator.setTo(ElevatorState.L4));
+    driverXbox.y().onTrue(m_endevator.setTo(EndEvatorState.L1));
+    driverXbox.x().onTrue(m_endevator.setTo(EndEvatorState.L2));
+    driverXbox.a().onTrue(m_endevator.setTo(EndEvatorState.L3));
+    driverXbox.b().onTrue(m_endevator.setTo(EndEvatorState.L4));
 
     // driverXbox.a().onTrue(m_endevator.moveElevatorTo(ElevatorState.L2));
     // driverXbox.b().and(() -> m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));

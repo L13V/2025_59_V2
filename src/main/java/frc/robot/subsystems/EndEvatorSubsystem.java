@@ -1,18 +1,13 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-
-import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,7 +19,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
      */
     static TalonFX elevator_motor = new TalonFX(EndevatorConstants.elevator_motor_id);
     static TalonFXConfiguration elevator_motor_config = new TalonFXConfiguration();
-    // static PositionDutyCycle elevator_PositionDutyCycle0 = new PositionDutyCycle(0).withSlot(0);
+    // static PositionDutyCycle elevator_PositionDutyCycle0 = new
+    // PositionDutyCycle(0).withSlot(0);
     static MotionMagicDutyCycle elevator_MotionMagicDutyCycle0 = new MotionMagicDutyCycle(0);
 
     /*
@@ -32,9 +28,11 @@ public class EndEvatorSubsystem extends SubsystemBase {
      */
     static TalonFX endeffector_pivot = new TalonFX(EndevatorConstants.endeffector_pivot_motor_id);
     static TalonFXConfiguration endeffector_pivot_config = new TalonFXConfiguration();
-    static PositionDutyCycle endeffector_PositionDutyCycle0 = new PositionDutyCycle(0).withSlot(0);
-    static PositionDutyCycle endeffector_PositionDutyCycle1 = new PositionDutyCycle(0).withSlot(1);
-
+    static PositionDutyCycle endeffector_PositionDutyCycle = new PositionDutyCycle(0);
+    /*
+     * Servo
+     */
+    static Servo antennaServo = new Servo(1);
 
     // Required initialization crap
     public void initialize() {
@@ -42,7 +40,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     }
 
-    public EndEvatorSubsystem() { // Motor Configuration Apply-ings ig.\
+    public EndEvatorSubsystem() { // Apply motor configs
         /*
          * Elevator Motor Config
          */
@@ -87,6 +85,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
         endeffector_pivot_config.Feedback.SensorToMechanismRatio = EndevatorConstants.endeffector_sensor_to_mechanism_ratio;
         endeffector_pivot_config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = EndevatorConstants.endeffector_duty_cycle_closed_loop_ramp;
         /*
+         * Servo Config
+         */
+
+        /*
          * Apply Configs
          */
         elevator_motor.getConfigurator().apply(elevator_motor_config);
@@ -97,7 +99,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public double initial_endeffector_position = 0.0;
 
     // Initialize ElevatorState Enum, and start at stow
-    public enum ElevatorState {
+    public enum EndEvatorState {
         L1,
         L2,
         L3,
@@ -110,15 +112,18 @@ public class EndEvatorSubsystem extends SubsystemBase {
         LOW_ALGAE_INTAKE,
         BARGE
     }
+    /* 
+     * All state machine interaction and reading
+     */
 
-    public ElevatorState state = ElevatorState.STOW;
+    public EndEvatorState state = EndEvatorState.STOW;
 
     /**
      * FUNCTION for setting the elevator state machine to another state.
      * 
      * @param setstateto
      */
-    public void setState(ElevatorState setstateto) {
+    public void setState(EndEvatorState setstateto) {
         initial_endeffector_position = getEndeffectorCurrentPosition();
         state = setstateto;
 
@@ -131,10 +136,39 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * @param setto
      * @return Command
      */
-    public Command setTo(ElevatorState setto) {
+    public Command setTo(EndEvatorState setto) {
         return runOnce(() -> setState(setto));
     }
+    /**
+     * Returns current elevator state.
+     * 
+     * @return EndEvatorState
+     */
+    public EndEvatorState getCurrentState() {
+        return state;
+    }
+    /**
+     * Sets elevator position
+     * 
+     * @param position
+     */
+    public void moveElevator(double position) {
+        elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(position));
 
+    }
+    /**
+     * Sets endeffector angle
+     * 
+     * @param position
+     */
+    public void moveEndeffector(double position, int slot) {
+        endeffector_pivot.setControl(endeffector_PositionDutyCycle.withPosition(position).withSlot(slot));
+
+    }
+
+    /*
+     * Various Functions used for retrieving positions of stuff.
+     */
     public double getElevatorCurrentPosition() {
         return elevator_motor.getPosition().getValueAsDouble();
     }
@@ -143,66 +177,66 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return endeffector_pivot.getPosition().getValueAsDouble();
     }
 
-    // Checking State Machine States
-    public ElevatorState getCurrentState() {
-        return state;
+    public double getServoPosition() {
+        return antennaServo.getPosition();
     }
 
-    // Booleans
-    public Boolean readyToStow() {
-        return getCurrentState() == (ElevatorState.L2);
+    /* 
+     * Booleans for controlling binds.
+     */
+    public Boolean readyToStow() { // TODO: Make this serve a real purpose
+        return getCurrentState() == (EndEvatorState.L2);
     }
 
     // State Machine Garbage
     public void periodic() {
         switch (state) {
             case L1 -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L1_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L1_angle));
+                moveElevator(EndevatorConstants.L1_height);
+                moveEndeffector(EndevatorConstants.coral_L1_angle, 0);
             }
             case L2 -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L2_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L2_angle));
+                moveElevator(EndevatorConstants.L2_height);
+                moveEndeffector(EndevatorConstants.coral_L2_angle, 0);
             }
             case L3 -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L3_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L3_angle));
+                moveElevator(EndevatorConstants.L3_height);
+                moveEndeffector(EndevatorConstants.coral_L3_angle, 0);
 
             }
             case L4 -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L4_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
+                moveElevator(EndevatorConstants.L4_height);
+                moveEndeffector(EndevatorConstants.teleop_L4_angle, 0);
 
             }
             case L4_Score -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L4_score_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
+                moveElevator(EndevatorConstants.L4_score_height);
+                moveEndeffector(EndevatorConstants.teleop_L4_angle, 0);
             }
             case STOW -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.coral_stow_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_coral_stow_angle));
-                // elevator_motor.setControl(endeffector_PositionDutyCycle0)
+                moveElevator(EndevatorConstants.coral_stow_height);
+                moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
             }
             case CORAL_FLOOR_INTAKE -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.coral_floor_pickup_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_floor_angle));
+                moveElevator(EndevatorConstants.coral_floor_pickup_height);
+                moveEndeffector(EndevatorConstants.coral_floor_angle, 0);
             }
             case ALGAE_FLOOR_INTAKE -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.algae_floor_pickup_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.algae_floor_angle));
+                moveElevator(EndevatorConstants.algae_floor_pickup_height);
+                moveEndeffector(EndevatorConstants.algae_floor_angle, 0);
             }
             case BARGE -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.barge_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle1.withPosition(EndevatorConstants.teleop_L4_angle));
+                moveElevator(EndevatorConstants.barge_height);
+                moveEndeffector(EndevatorConstants.teleop_L4_angle, 0); //TODO: VERIFY
             }
             case HIGH_ALGAE_INTAKE -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.algae_L3_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.algae_L3_angle));
+                moveElevator(EndevatorConstants.algae_L3_height);
+                moveEndeffector(EndevatorConstants.algae_L3_angle, 0);
 
             }
             case LOW_ALGAE_INTAKE -> {
-                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.algae_L2_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.algae_L2_angle));
+                moveElevator(EndevatorConstants.algae_L2_height);
+                moveEndeffector(EndevatorConstants.algae_L2_angle, 0);
             }
 
         }
