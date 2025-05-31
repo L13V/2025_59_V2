@@ -106,6 +106,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
         STOW,
         CORAL_FLOOR_INTAKE,
         ALGAE_FLOOR_INTAKE,
+        HIGH_ALGAE_INTAKE,
+        LOW_ALGAE_INTAKE,
         BARGE
     }
 
@@ -191,7 +193,16 @@ public class EndEvatorSubsystem extends SubsystemBase {
             }
             case BARGE -> {
                 elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.barge_height));
-                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle1.withPosition(EndevatorConstants.teleop_L4_angle));
+            }
+            case HIGH_ALGAE_INTAKE -> {
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.algae_L3_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.algae_L3_angle));
+
+            }
+            case LOW_ALGAE_INTAKE -> {
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.algae_L2_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.algae_L2_angle));
             }
 
         }
