@@ -160,7 +160,7 @@ public final class Constants {
     public static final int coral_floor_angle = 125;
     public static final int algae_floor_angle = 160;
     // Barge
-    public static final int barge_angle = 25;
+    public static final int barge_flick_angle = 25;
     // L4
     public static final int auto_L4_angle = 35;
     public static final int teleop_L4_angle = 35;

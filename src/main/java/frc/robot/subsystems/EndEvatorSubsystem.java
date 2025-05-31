@@ -112,7 +112,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
         LOW_ALGAE_INTAKE,
         BARGE
     }
-    /* 
+    /*
      * All state machine interaction and reading
      */
 
@@ -139,6 +139,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public Command setTo(EndEvatorState setto) {
         return runOnce(() -> setState(setto));
     }
+
     /**
      * Returns current elevator state.
      * 
@@ -147,6 +148,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public EndEvatorState getCurrentState() {
         return state;
     }
+
     /**
      * Sets elevator position
      * 
@@ -156,6 +158,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
         elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(position));
 
     }
+
     /**
      * Sets endeffector angle
      * 
@@ -164,6 +167,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public void moveEndeffector(double position, int slot) {
         endeffector_pivot.setControl(endeffector_PositionDutyCycle.withPosition(position).withSlot(slot));
 
+    }
+
+    public void moveAntennaServo(double position) {
+        antennaServo.set(position);
     }
 
     /*
@@ -181,11 +188,19 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return antennaServo.getPosition();
     }
 
-    /* 
+    /*
      * Booleans for controlling binds.
      */
     public Boolean readyToStow() { // TODO: Make this serve a real purpose
         return getCurrentState() == (EndEvatorState.L2);
+    }
+
+    public Boolean hasCoral() { // TODO: Make this serve a real purpose
+        return false;
+    }
+
+    public Boolean hasAlgae() { // TODO: Make this serve a real purpose
+        return true;
     }
 
     // State Machine Garbage
@@ -194,49 +209,67 @@ public class EndEvatorSubsystem extends SubsystemBase {
             case L1 -> {
                 moveElevator(EndevatorConstants.L1_height);
                 moveEndeffector(EndevatorConstants.coral_L1_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
             }
             case L2 -> {
                 moveElevator(EndevatorConstants.L2_height);
                 moveEndeffector(EndevatorConstants.coral_L2_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
             }
             case L3 -> {
                 moveElevator(EndevatorConstants.L3_height);
                 moveEndeffector(EndevatorConstants.coral_L3_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
 
             }
             case L4 -> {
                 moveElevator(EndevatorConstants.L4_height);
                 moveEndeffector(EndevatorConstants.teleop_L4_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
 
             }
             case L4_Score -> {
                 moveElevator(EndevatorConstants.L4_score_height);
                 moveEndeffector(EndevatorConstants.teleop_L4_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
             }
             case STOW -> {
-                moveElevator(EndevatorConstants.coral_stow_height);
-                moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
+                if (hasAlgae()) {
+                    moveElevator(EndevatorConstants.algae_stow_height);
+                    moveEndeffector(EndevatorConstants.algae_stow_angle, 0);
+                    moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);// TODO: Verify
+                } else if (hasCoral()) {
+                    moveElevator(EndevatorConstants.coral_stow_height);
+                    moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
+                    moveAntennaServo(EndevatorConstants.antenna_home);
+                }
+
             }
             case CORAL_FLOOR_INTAKE -> {
                 moveElevator(EndevatorConstants.coral_floor_pickup_height);
                 moveEndeffector(EndevatorConstants.coral_floor_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
             }
             case ALGAE_FLOOR_INTAKE -> {
                 moveElevator(EndevatorConstants.algae_floor_pickup_height);
                 moveEndeffector(EndevatorConstants.algae_floor_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_floor_intake_limit);
             }
             case BARGE -> {
                 moveElevator(EndevatorConstants.barge_height);
-                moveEndeffector(EndevatorConstants.teleop_L4_angle, 0); //TODO: VERIFY
+                moveEndeffector(EndevatorConstants.algae_stow_angle, 0); // TODO: VERIFY
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
             case HIGH_ALGAE_INTAKE -> {
                 moveElevator(EndevatorConstants.algae_L3_height);
                 moveEndeffector(EndevatorConstants.algae_L3_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
 
             }
             case LOW_ALGAE_INTAKE -> {
                 moveElevator(EndevatorConstants.algae_L2_height);
                 moveEndeffector(EndevatorConstants.algae_L2_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
 
         }
