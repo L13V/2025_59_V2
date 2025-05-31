@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
@@ -23,7 +24,9 @@ public class EndEvatorSubsystem extends SubsystemBase {
      */
     static TalonFX elevator_motor = new TalonFX(EndevatorConstants.elevator_motor_id);
     static TalonFXConfiguration elevator_motor_config = new TalonFXConfiguration();
-    static PositionDutyCycle elevator_PositionDutyCycle0 = new PositionDutyCycle(0).withSlot(0);
+    // static PositionDutyCycle elevator_PositionDutyCycle0 = new PositionDutyCycle(0).withSlot(0);
+    static MotionMagicDutyCycle elevator_MotionMagicDutyCycle0 = new MotionMagicDutyCycle(0);
+
     /*
      * Endeffector pivot
      */
@@ -31,6 +34,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     static TalonFXConfiguration endeffector_pivot_config = new TalonFXConfiguration();
     static PositionDutyCycle endeffector_PositionDutyCycle0 = new PositionDutyCycle(0).withSlot(0);
     static PositionDutyCycle endeffector_PositionDutyCycle1 = new PositionDutyCycle(0).withSlot(1);
+
 
     // Required initialization crap
     public void initialize() {
@@ -151,42 +155,43 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public void periodic() {
         switch (state) {
             case L1 -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L1_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L1_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L1_angle));
             }
             case L2 -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L2_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L2_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L2_angle));
             }
             case L3 -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L3_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L3_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_L3_angle));
 
             }
             case L4 -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L4_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L4_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
 
             }
             case L4_Score -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.L4_score_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.L4_score_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
             }
             case STOW -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.coral_stow_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.coral_stow_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_coral_stow_angle));
                 // elevator_motor.setControl(endeffector_PositionDutyCycle0)
             }
             case CORAL_FLOOR_INTAKE -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.coral_floor_pickup_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.coral_floor_pickup_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.coral_floor_angle));
             }
             case ALGAE_FLOOR_INTAKE -> {
-                elevator_motor.setControl(elevator_PositionDutyCycle0.withPosition(EndevatorConstants.algae_floor_pickup_height));
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.algae_floor_pickup_height));
                 endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.algae_floor_angle));
             }
-            
             case BARGE -> {
+                elevator_motor.setControl(elevator_MotionMagicDutyCycle0.withPosition(EndevatorConstants.barge_height));
+                endeffector_pivot.setControl(endeffector_PositionDutyCycle0.withPosition(EndevatorConstants.teleop_L4_angle));
             }
 
         }

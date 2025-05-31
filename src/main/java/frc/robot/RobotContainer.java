@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -110,8 +111,11 @@ public class RobotContainer {
 
     driverXbox.y().onTrue(m_endevator.setTo(ElevatorState.L1));
     driverXbox.x().onTrue(m_endevator.setTo(ElevatorState.L2));
+    driverXbox.a().onTrue(m_endevator.setTo(ElevatorState.L3));
+    driverXbox.b().onTrue(m_endevator.setTo(ElevatorState.L4));
+
     // driverXbox.a().onTrue(m_endevator.moveElevatorTo(ElevatorState.L2));
-    driverXbox.b().and(() -> m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));
+    // driverXbox.b().and(() -> m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));
 
     driverXbox.start().whileTrue(Commands.none());
     driverXbox.back().whileTrue(Commands.none());
