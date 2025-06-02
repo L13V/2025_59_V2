@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CoralIntakeConstants;
 import frc.robot.Constants.EndevatorConstants;
 
 public class EndEvatorSubsystem extends SubsystemBase {
@@ -29,10 +32,17 @@ public class EndEvatorSubsystem extends SubsystemBase {
     static TalonFX endeffector_pivot = new TalonFX(EndevatorConstants.endeffector_pivot_motor_id);
     static TalonFXConfiguration endeffector_pivot_config = new TalonFXConfiguration();
     static PositionDutyCycle endeffector_PositionDutyCycle = new PositionDutyCycle(0);
+
     /*
      * Servo
      */
     static Servo antennaServo = new Servo(1);
+
+    /*
+     * Coral CANRange
+     */
+    static CANrange coral_range = new CANrange(CoralIntakeConstants.ci_coral_range_id);
+    static CANrangeConfiguration coral_range_config = new CANrangeConfiguration();
 
     // Required initialization crap
     public void initialize() {
@@ -85,14 +95,15 @@ public class EndEvatorSubsystem extends SubsystemBase {
         endeffector_pivot_config.Feedback.SensorToMechanismRatio = EndevatorConstants.endeffector_sensor_to_mechanism_ratio;
         endeffector_pivot_config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = EndevatorConstants.endeffector_duty_cycle_closed_loop_ramp;
         /*
-         * Servo Config
+         * Coral CANRange Config
          */
-
+        coral_range_config.ProximityParams.ProximityThreshold = CoralIntakeConstants.ci_coral_threshhold;
         /*
          * Apply Configs
          */
         elevator_motor.getConfigurator().apply(elevator_motor_config);
         endeffector_pivot.getConfigurator().apply(endeffector_pivot_config);
+        coral_range.getConfigurator().apply(coral_range_config);
         System.out.println("ElevatorSubsystem Initialized");
     }
 
