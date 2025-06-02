@@ -208,11 +208,11 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public Boolean readyToStow() { // TODO: Make this serve a real purpose
         return getCurrentState() == (EndEvatorState.L2);
     }
-    public BooleanSupplier coral = () -> hasCoral();
+    public BooleanSupplier coralSupplier = () -> hasCoral();
     public Boolean hasCoral() { // TODO: Make this serve a real purpose
         return false;
     }
-    public BooleanSupplier algae  = () -> hasAlgae();
+    public BooleanSupplier algaeSupplier  = () -> hasAlgae();
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
         return true;
     }
