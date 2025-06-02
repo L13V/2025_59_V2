@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.EndevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.EndEvatorSubsystem;
@@ -113,7 +114,7 @@ public class RobotContainer {
     driverXbox.x().onTrue(m_endevator.setTo(EndEvatorState.L2));
     driverXbox.a().onTrue(m_endevator.setTo(EndEvatorState.L3));
     driverXbox.b().onTrue(m_endevator.setTo(EndEvatorState.L4));
-    driverXbox.b().and(m_endevator.coral);
+    // driverXbox.b().and(m_endevator.coralSupplier);
 
     // driverXbox.a().onTrue(m_endevator.moveElevatorTo(ElevatorState.L2));
     // driverXbox.b().and(() -> m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));

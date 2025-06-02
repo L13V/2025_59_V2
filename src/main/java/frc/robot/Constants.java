@@ -72,6 +72,8 @@ public final class Constants {
     public static final double bi_algae_stow_position = 100;
     public static final double bi_algae_score_position = 80;
     public static final double bi_climb_position = 182;
+    //Sensor Thresholds
+    public static final double bi_algae_threshhold = 0.7; //TODO: FIX
   }
 
   public static class EndevatorConstants {
@@ -196,7 +198,7 @@ public final class Constants {
     public static final int ci_left_motor_id = 53;
     public static final int ci_top_motor_id = 54;
     public static final int ci_right_motor_id = 55;
-    public static final int ci_endeffector_range_id = 56;
+    public static final int ci_coral_range_id = 56;
     /*
      * Powers for Various Tasks
      */
@@ -221,7 +223,8 @@ public final class Constants {
     public static final double ci_auto_barge_score_power = 0.75; // Outtake ball
     // Processor Score
     public static final double ci_processor_score_power = 0.4;
-
+    // Detection Threshholds
+    public static final double ci_coral_threshhold = 0.7; //TODO: FIX
   }
 
 }
