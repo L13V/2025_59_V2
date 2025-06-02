@@ -16,9 +16,11 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.BallIntakeConstants;
+import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 
 public class BallIntakeSubsystem extends SubsystemBase {
 
@@ -44,7 +46,6 @@ public class BallIntakeSubsystem extends SubsystemBase {
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         PivotMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-
         CANrangeConfiguration configAlgae = new CANrangeConfiguration();
         configAlgae.ProximityParams.MinSignalStrengthForValidMeasurement = 2000; // If CANrange has a signal strength of
                                                                                  // at least 2000, it is a valid
@@ -56,6 +57,7 @@ public class BallIntakeSubsystem extends SubsystemBase {
                                                                             // short-range mode.
         algaeCanRange.getConfigurator().apply(configAlgae);
     }
+
     public enum BallIntakeState {
         STOW,
         HOLD,
@@ -65,7 +67,7 @@ public class BallIntakeSubsystem extends SubsystemBase {
 
     public BallIntakeState state = BallIntakeState.STOW;
 
-        /**
+    /**
      * FUNCTION for setting the elevator state machine to another state.
      * 
      * @param setstateto
@@ -86,11 +88,12 @@ public class BallIntakeSubsystem extends SubsystemBase {
         return runOnce(() -> setState(setto));
     }
 
+    public BallIntakeState getCurrentState() {
+        return state;
+    }
 
-    
+    public boolean isCanAlgaeDetected() {
 
-    public boolean isCanAlgaeDetected(){
-                
         var distance = algaeCanRange.getDistance();
         var signalStrength = algaeCanRange.getSignalStrength();
         /**
@@ -98,58 +101,63 @@ public class BallIntakeSubsystem extends SubsystemBase {
          */
         var isDetected = algaeCanRange.getIsDetected(false);
         /* This time wait for the signal to reduce latency */
-        isDetected.waitForUpdate(PRINT_PERIOD); 
-
+        isDetected.waitForUpdate(PRINT_PERIOD);
 
         return isDetected.getValue();
     }
 
-    public void moveRollerByPower(double power){
-        if (Math.abs(power) > 1){
+    public void moveRollerByPower(double power) {
+        if (Math.abs(power) > 1) {
             rollerMotor_right.set(1);
-        }else {
-            if(power > 0 ){
+        } else {
+            if (power > 0) {
                 rollerMotor_right.set(power);
 
-            }else {
+            } else {
                 rollerMotor_right.set(power);
-            }    
+            }
         }
     }
 
-    public void moveIntakeToPosition(double position){
-            pid.setReference(position, ControlType.kPosition);
+    public void moveIntakeToPosition(double position) {
+        pid.setReference(position, ControlType.kPosition);
     }
-    public double getPosition(){
+
+    public double getPosition() {
         return abs_encoder.getPosition();
     }
 
-    public void periodic(){
+    public void periodic() {
         switch (state) {
             case STOW -> {
-                moveIntakeToPosition(BallIntakeConstants.bi_stow_position);
-                moveRollerByPower(BallIntakeConstants.bi_idle_power);
+                if (isCanAlgaeDetected()) {
+                    moveIntakeToPosition(BallIntakeConstants.bi_algae_stow_position);
+                    moveRollerByPower(BallIntakeConstants.bi_hold_power);
+                } else {
+                    moveIntakeToPosition(BallIntakeConstants.bi_stow_position);
+                    moveRollerByPower(BallIntakeConstants.bi_idle_power);
+                }
+
             }
             case HOLD -> {
-                moveIntakeToPosition(BallIntakeConstants.bi_algae_stow_position);
-                moveRollerByPower(BallIntakeConstants.bi_hold_power);
-            
+                // moveIntakeToPosition(BallIntakeConstants.bi_algae_stow_position);
+                // moveRollerByPower(BallIntakeConstants.bi_hold_power);
+
             }
-            case INTAKE ->{
+            case INTAKE -> {
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_intake_position);
                 moveRollerByPower(BallIntakeConstants.bi_intake_power);
-                if (isCanAlgaeDetected()){
-                    state = BallIntakeState.HOLD;
+                if (isCanAlgaeDetected()) {
+                    state = BallIntakeState.STOW;
                 }
             }
-            case SCORE ->{
+            case SCORE -> {
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_score_position);
                 moveRollerByPower(BallIntakeConstants.bi_outtake_power);
             }
 
+        }
+        SmartDashboard.putString("State2", state.toString());
+
     }
-
-
 }
-}
-

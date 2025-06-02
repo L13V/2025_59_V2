@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.EndevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.BallIntakeSubsystem;
 import frc.robot.subsystems.EndEvatorSubsystem;
+import frc.robot.subsystems.BallIntakeSubsystem.BallIntakeState;
 import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 
 import java.io.File;
@@ -38,6 +40,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final EndEvatorSubsystem m_endevator = new EndEvatorSubsystem();
+  private final BallIntakeSubsystem m_ballintake = new BallIntakeSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -110,10 +113,14 @@ public class RobotContainer {
 
     }
 
-    driverXbox.y().onTrue(m_endevator.setTo(EndEvatorState.L1));
-    driverXbox.x().onTrue(m_endevator.setTo(EndEvatorState.L2));
-    driverXbox.a().onTrue(m_endevator.setTo(EndEvatorState.L3));
-    driverXbox.b().onTrue(m_endevator.setTo(EndEvatorState.L4));
+    // driverXbox.y().onTrue(m_endevator.setTo(EndEvatorState.L1));
+    // driverXbox.x().onTrue(m_endevator.setTo(EndEvatorState.L2));
+    // driverXbox.a().onTrue(m_endevator.setTo(EndEvatorState.L3));
+    // driverXbox.b().onTrue(m_endevator.setTo(EndEvatorState.L4));
+
+    driverXbox.a().onTrue(m_ballintake.setTo(BallIntakeState.INTAKE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
+    driverXbox.b().onTrue(m_ballintake.setTo(BallIntakeState.SCORE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
+
     // driverXbox.b().and(m_endevator.coralSupplier);
 
     // driverXbox.a().onTrue(m_endevator.moveElevatorTo(ElevatorState.L2));

@@ -60,7 +60,7 @@ public final class Constants {
 
   public static class BallIntakeConstants { // bi is Ball Intake
     // Motor IDs
-    public static final int bi_roller_motor_id = 59;
+    public static final int bi_roller_motor_id = 61;
     public static final int bi_pivot_motor_id = 60;
     // Sensor IDS
     public static final int bi_range_id = 57;
