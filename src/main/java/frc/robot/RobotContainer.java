@@ -114,6 +114,7 @@ public class RobotContainer {
     driverXbox.x().onTrue(m_endevator.setTo(EndEvatorState.L2));
     driverXbox.a().onTrue(m_endevator.setTo(EndEvatorState.L3));
     driverXbox.b().onTrue(m_endevator.setTo(EndEvatorState.L4));
+    driverXbox.b().and(m_endevator.coral);
 
     // driverXbox.a().onTrue(m_endevator.moveElevatorTo(ElevatorState.L2));
     // driverXbox.b().and(() -> m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));
