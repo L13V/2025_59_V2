@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -236,9 +235,6 @@ public class EndEvatorSubsystem extends SubsystemBase {
     /*
      * Booleans for controlling binds.
      */
-    public Boolean readyToStow() { // TODO: Make this serve a real purpose
-        return getCurrentState() == (EndEvatorState.L2);
-    }
 
     /*
      * Coral
@@ -248,10 +244,11 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public BooleanSupplier hasNoCoralSupplier = () -> !hasCoral();
     public BooleanSupplier notReadyToRaiseWithCoralSupplier = () -> !readyToRaiseWithCoral();
 
-    public Boolean hasCoral() { // TODO: Make this serve a real purpose
+    public Boolean hasCoral() {
         return coral_range.getIsDetected(true).getValue();
     }
-    public Boolean readyToRaiseWithCoral() { 
+
+    public Boolean readyToRaiseWithCoral() {
         return coral_range.getIsDetected(true).getValue() && state != EndEvatorState.CORAL_FLOOR_INTAKE;
     }
 
@@ -360,14 +357,9 @@ public class EndEvatorSubsystem extends SubsystemBase {
             default -> throw new IllegalArgumentException("Unexpected value: " + state);
 
         }
-        SmartDashboard.putString("State", state.toString());
-        SmartDashboard.putBoolean("ReadyToStow", readyToStow());
+        SmartDashboard.putString("EndEvator State", state.toString());
         SmartDashboard.putBoolean("HasAlgae", hasAlgae());
         SmartDashboard.putBoolean("HasCoral", hasCoral());
-        SmartDashboard.putNumber("CurrentPos", elevator_motor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("TargetPos", elevator_MotionMagicDutyCycle0.getPositionMeasure().in(Units.Rotations));
-
-
     }
 
 }

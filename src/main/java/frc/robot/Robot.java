@@ -7,13 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.EndEvatorSubsystem;
-import frc.robot.subsystems.BallIntakeSubsystem.BallIntakeState;
-import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -93,7 +90,7 @@ public class Robot extends TimedRobot {
       case INTAKING -> {
         if (m_endevator.hasCoral()) {
           state = RobotState.ENDEFFECTOR_CORAL;
-        }else if (m_endevator.hasAlgae()) {
+        } else if (m_endevator.hasAlgae()) {
           state = RobotState.ENDEFFECTOR_ALGAE;
         }
       }
