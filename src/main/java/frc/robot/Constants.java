@@ -72,6 +72,11 @@ public final class Constants {
     public static final double bi_climb_position = 182;
     //Sensor Thresholds
     public static final double bi_algae_threshhold = 0.7; //TODO: FIX
+    //Power
+    public static final double bi_intake_power = 0.4 ; 
+    public static final double bi_outtake_power = -0.25 ; 
+    public static final double bi_idle_power = 0.04 ; 
+    public static final double bi_hold_power = 0.15 ; 
   }
 
   public static class EndevatorConstants {
