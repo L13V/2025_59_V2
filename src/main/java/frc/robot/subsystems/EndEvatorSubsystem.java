@@ -36,6 +36,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      */
     static Servo antennaServo = new Servo(1);
     public BooleanSupplier coral = () -> hasCoral();
+    public BooleanSupplier algae  = () -> hasAlgae();
 
     // Required initialization crap
     public void initialize() {
