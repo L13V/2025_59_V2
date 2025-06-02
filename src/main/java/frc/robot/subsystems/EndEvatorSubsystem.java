@@ -123,12 +123,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     // Initialize ElevatorState Enum, and start at stow
     public enum EndEvatorState {
+        STOW,
+        STARTING,
         L1,
         L2,
         L3,
         L4,
         L4_Score,
-        STOW,
         CORAL_FLOOR_INTAKE,
         ALGAE_FLOOR_INTAKE,
         HIGH_ALGAE_INTAKE,
@@ -140,7 +141,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * All state machine interaction and reading
      */
 
-    public EndEvatorState state = EndEvatorState.STOW;
+    public EndEvatorState state = EndEvatorState.STARTING;
 
     /**
      * FUNCTION for setting the elevator state machine to another state.
@@ -222,18 +223,35 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public BooleanSupplier coralSupplier = () -> hasCoral();
 
     public Boolean hasCoral() { // TODO: Make this serve a real purpose
-        return coral_range.getIsDetected(false).getValue();
+        return coral_range.getIsDetected(true).getValue();
     }
 
     public BooleanSupplier algaeSupplier = () -> hasAlgae();
 
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
-        return algae_range.getIsDetected(false).getValue();
+        return algae_range.getIsDetected(true).getValue();
     }
 
     // State Machine Garbage
     public void periodic() {
         switch (state) {
+            case STARTING -> {
+                moveElevator(0);
+                moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
+            }
+            case STOW -> {
+                if (hasAlgae()) {
+                    moveElevator(EndevatorConstants.algae_stow_height);
+                    moveEndeffector(EndevatorConstants.algae_stow_angle, 0);
+                    moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
+                } else if (hasCoral()) {
+                    moveElevator(EndevatorConstants.coral_stow_height);
+                    moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
+                    moveAntennaServo(EndevatorConstants.antenna_home);
+                }
+
+            }
             case L1 -> {
                 moveElevator(EndevatorConstants.L1_height);
                 moveEndeffector(EndevatorConstants.coral_L1_angle, 0);
@@ -260,18 +278,6 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveElevator(EndevatorConstants.L4_score_height);
                 moveEndeffector(EndevatorConstants.teleop_L4_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_home);
-            }
-            case STOW -> {
-                if (hasAlgae()) {
-                    moveElevator(EndevatorConstants.algae_stow_height);
-                    moveEndeffector(EndevatorConstants.algae_stow_angle, 0);
-                    moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);// TODO: Verify
-                } else if (hasCoral()) {
-                    moveElevator(EndevatorConstants.coral_stow_height);
-                    moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
-                    moveAntennaServo(EndevatorConstants.antenna_home);
-                }
-
             }
             case CORAL_FLOOR_INTAKE -> {
                 moveElevator(EndevatorConstants.coral_floor_pickup_height);
@@ -304,9 +310,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveEndeffector(EndevatorConstants.barge_flick_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
+            default -> throw new IllegalArgumentException("Unexpected value: " + state);
 
         }
+
         SmartDashboard.putString("State", state.toString());
         SmartDashboard.putBoolean("ReadyToStow", readyToStow());
+        SmartDashboard.putBoolean("HasAlgae", hasAlgae());
+        SmartDashboard.putBoolean("HasCoral", hasCoral());
     }
 }
