@@ -212,7 +212,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public Boolean hasCoral() { // TODO: Make this serve a real purpose
         return false;
     }
-
+    public BooleanSupplier algae  = () -> hasAlgae();
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
         return true;
     }
