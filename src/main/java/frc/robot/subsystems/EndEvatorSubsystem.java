@@ -110,7 +110,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
         ALGAE_FLOOR_INTAKE,
         HIGH_ALGAE_INTAKE,
         LOW_ALGAE_INTAKE,
-        BARGE
+        BARGE,
+        FLICK
     }
     /*
      * All state machine interaction and reading
@@ -269,6 +270,11 @@ public class EndEvatorSubsystem extends SubsystemBase {
             case LOW_ALGAE_INTAKE -> {
                 moveElevator(EndevatorConstants.algae_L2_height);
                 moveEndeffector(EndevatorConstants.algae_L2_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
+            }
+            case FLICK -> {
+                moveElevator(EndevatorConstants.barge_height);
+                moveEndeffector(EndevatorConstants.barge_flick_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
 
