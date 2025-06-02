@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.CoralIntakeConstants;
+import frc.robot.Constants.EndeffectorIntakeConstants;
 import frc.robot.Constants.EndevatorConstants;
 
 public class EndEvatorSubsystem extends SubsystemBase {
@@ -43,8 +43,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
     /*
      * Coral CANRange
      */
-    static CANrange coral_range = new CANrange(CoralIntakeConstants.ci_coral_range_id);
+    static CANrange coral_range = new CANrange(EndeffectorIntakeConstants.ei_coral_range_id);
     static CANrangeConfiguration coral_range_config = new CANrangeConfiguration();
+    /*
+     * Algae CANRange
+     */
+    static CANrange algae_range = new CANrange(EndeffectorIntakeConstants.ei_algae_range_id);
+    static CANrangeConfiguration algae_range_config = new CANrangeConfiguration();
 
     // Required initialization crap
     public void initialize() {
@@ -99,13 +104,18 @@ public class EndEvatorSubsystem extends SubsystemBase {
         /*
          * Coral CANRange Config
          */
-        coral_range_config.ProximityParams.ProximityThreshold = CoralIntakeConstants.ci_coral_threshhold;
+        coral_range_config.ProximityParams.ProximityThreshold = EndeffectorIntakeConstants.ei_coral_threshhold;
+        /*
+         * Algae CANRange Config
+         */
+        algae_range_config.ProximityParams.ProximityThreshold = EndeffectorIntakeConstants.ei_algae_threshhold;
         /*
          * Apply Configs
          */
         elevator_motor.getConfigurator().apply(elevator_motor_config);
         endeffector_pivot.getConfigurator().apply(endeffector_pivot_config);
         coral_range.getConfigurator().apply(coral_range_config);
+        algae_range.getConfigurator().apply(algae_range_config);
         System.out.println("ElevatorSubsystem Initialized");
     }
 
@@ -113,12 +123,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     // Initialize ElevatorState Enum, and start at stow
     public enum EndEvatorState {
+        STOW,
+        STARTING,
         L1,
         L2,
         L3,
         L4,
         L4_Score,
-        STOW,
         CORAL_FLOOR_INTAKE,
         ALGAE_FLOOR_INTAKE,
         HIGH_ALGAE_INTAKE,
@@ -130,7 +141,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * All state machine interaction and reading
      */
 
-    public EndEvatorState state = EndEvatorState.STOW;
+    public EndEvatorState state = EndEvatorState.STARTING;
 
     /**
      * FUNCTION for setting the elevator state machine to another state.
@@ -208,18 +219,39 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public Boolean readyToStow() { // TODO: Make this serve a real purpose
         return getCurrentState() == (EndEvatorState.L2);
     }
+
     public BooleanSupplier coralSupplier = () -> hasCoral();
+
     public Boolean hasCoral() { // TODO: Make this serve a real purpose
-        return false;
+        return coral_range.getIsDetected(true).getValue();
     }
-    public BooleanSupplier algaeSupplier  = () -> hasAlgae();
+
+    public BooleanSupplier algaeSupplier = () -> hasAlgae();
+
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
-        return true;
+        return algae_range.getIsDetected(true).getValue();
     }
 
     // State Machine Garbage
     public void periodic() {
         switch (state) {
+            case STARTING -> {
+                moveElevator(0);
+                moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
+            }
+            case STOW -> {
+                if (hasAlgae()) {
+                    moveElevator(EndevatorConstants.algae_stow_height);
+                    moveEndeffector(EndevatorConstants.algae_stow_angle, 0);
+                    moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
+                } else if (hasCoral()) {
+                    moveElevator(EndevatorConstants.coral_stow_height);
+                    moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
+                    moveAntennaServo(EndevatorConstants.antenna_home);
+                }
+
+            }
             case L1 -> {
                 moveElevator(EndevatorConstants.L1_height);
                 moveEndeffector(EndevatorConstants.coral_L1_angle, 0);
@@ -246,18 +278,6 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveElevator(EndevatorConstants.L4_score_height);
                 moveEndeffector(EndevatorConstants.teleop_L4_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_home);
-            }
-            case STOW -> {
-                if (hasAlgae()) {
-                    moveElevator(EndevatorConstants.algae_stow_height);
-                    moveEndeffector(EndevatorConstants.algae_stow_angle, 0);
-                    moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);// TODO: Verify
-                } else if (hasCoral()) {
-                    moveElevator(EndevatorConstants.coral_stow_height);
-                    moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
-                    moveAntennaServo(EndevatorConstants.antenna_home);
-                }
-
             }
             case CORAL_FLOOR_INTAKE -> {
                 moveElevator(EndevatorConstants.coral_floor_pickup_height);
@@ -290,9 +310,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveEndeffector(EndevatorConstants.barge_flick_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
+            default -> throw new IllegalArgumentException("Unexpected value: " + state);
 
         }
+
         SmartDashboard.putString("State", state.toString());
         SmartDashboard.putBoolean("ReadyToStow", readyToStow());
+        SmartDashboard.putBoolean("HasAlgae", hasAlgae());
+        SmartDashboard.putBoolean("HasCoral", hasCoral());
     }
 }
