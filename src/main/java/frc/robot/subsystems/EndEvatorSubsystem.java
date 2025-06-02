@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
@@ -33,6 +35,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * Servo
      */
     static Servo antennaServo = new Servo(1);
+    public BooleanSupplier coral = () -> hasCoral();
 
     // Required initialization crap
     public void initialize() {
