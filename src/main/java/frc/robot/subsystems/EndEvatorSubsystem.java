@@ -11,6 +11,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +22,7 @@ import frc.robot.Constants.EndeffectorIntakeConstants;
 import frc.robot.Constants.EndevatorConstants;
 
 public class EndEvatorSubsystem extends SubsystemBase {
+    
     /*
      * Elevator Motor
      */
@@ -202,15 +206,75 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * Various Functions used for retrieving positions of stuff.
      */
     public double getElevatorCurrentPosition() {
-        return elevator_motor.getPosition().getValueAsDouble();
+        return elevator_motor.getPosition().refresh().getValueAsDouble();
     }
 
     public double getEndeffectorCurrentPosition() {
-        return endeffector_pivot.getPosition().getValueAsDouble();
+        return endeffector_pivot.getPosition().refresh().getValueAsDouble();
     }
 
     public double getServoPosition() {
         return antennaServo.getPosition();
+    }
+
+    public double getElevatorTargetPosition() {
+        // return elevator_motor.getClosedLoopOutput().getValueAsDouble();
+        return elevator_MotionMagicDutyCycle0.getPositionMeasure().in(Units.Rotations);
+    }
+
+    public BooleanSupplier atElevatorTargetPosition(EndEvatorState state) {
+        switch (state) {
+            case L1 -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.L1_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.L1_height - 1);
+            }
+            case L2 -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.L2_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.L2_height - 1);
+            }
+            case L3 -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.L3_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.L3_height - 1);
+            }
+            case L4 -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.L4_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.L4_height - 1);
+            }
+            case L4_Score -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.L4_score_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.L4_score_height - 1);
+            }
+            case CORAL_FLOOR_INTAKE -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.coral_floor_pickup_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.coral_floor_pickup_height - 1);
+            }
+            case ALGAE_FLOOR_INTAKE -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.algae_floor_pickup_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.algae_floor_pickup_height - 1);
+            }
+            case HIGH_ALGAE_INTAKE -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.algae_L3_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.algae_L3_height - 1);
+            }
+            case LOW_ALGAE_INTAKE -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.algae_L2_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.algae_L2_height - 1);
+            }
+            case BARGE -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.barge_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.barge_height - 1);
+            }
+            case FLICK -> {
+                return () -> (getElevatorCurrentPosition() <= EndevatorConstants.barge_height + 1)
+                        && (getElevatorCurrentPosition() >= EndevatorConstants.barge_height - 1);
+            }
+            default -> {
+                return () -> false; // Return false for other states or handle them as needed
+            }
+        }
+    }
+    public BooleanSupplier notatElevatorTargetPosition(EndEvatorState state) {
+        return () -> (!atElevatorTargetPosition(state).getAsBoolean());
     }
 
     /*
@@ -220,16 +284,37 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return getCurrentState() == (EndEvatorState.L2);
     }
 
-    public BooleanSupplier coralSupplier = () -> hasCoral();
+    /*
+     * Coral
+     */
+    public BooleanSupplier hasCoralSupplier = () -> hasCoral();
+    public BooleanSupplier hasNoCoralSupplier = () -> !hasCoral();
 
     public Boolean hasCoral() { // TODO: Make this serve a real purpose
         return coral_range.getIsDetected(true).getValue();
     }
 
-    public BooleanSupplier algaeSupplier = () -> hasAlgae();
+    /*
+     * Algae
+     */
+    public BooleanSupplier hasAlgaeSupplier = () -> hasAlgae();
+    public BooleanSupplier hasNoAlgaeSupplier = () -> !hasAlgae();
 
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
-        return algae_range.getIsDetected(true).getValue();
+        // return algae_range.getIsDetected(true).getValue();
+        return false;
+    }
+
+    /*
+     * Check for state matches
+     */
+
+    public BooleanSupplier isAt(EndEvatorState state) {
+        return () -> getCurrentState() == state;
+    }
+
+    public BooleanSupplier isNotAt(EndEvatorState state) {
+        return () -> getCurrentState() != state;
     }
 
     // State Machine Garbage
@@ -245,7 +330,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
                     moveElevator(EndevatorConstants.algae_stow_height);
                     moveEndeffector(EndevatorConstants.algae_stow_angle, 0);
                     moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
-                } else if (hasCoral()) {
+                } else {
                     moveElevator(EndevatorConstants.coral_stow_height);
                     moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
                     moveAntennaServo(EndevatorConstants.antenna_home);
@@ -318,5 +403,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("ReadyToStow", readyToStow());
         SmartDashboard.putBoolean("HasAlgae", hasAlgae());
         SmartDashboard.putBoolean("HasCoral", hasCoral());
+        // SmartDashboard.putNumber("Target", getElevatorTargetPosition());
+        SmartDashboard.putNumber("CurrentPos", elevator_motor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("TargetPos", elevator_MotionMagicDutyCycle0.getPositionMeasure().in(Units.Rotations));
+        // SmartDashboard.putBoolean("AtTargetPos", atElevatorTargetPosition().getAsBoolean());
+
     }
 }

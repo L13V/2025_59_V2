@@ -113,10 +113,14 @@ public class RobotContainer {
 
     }
 
-    // driverXbox.y().onTrue(m_endevator.setTo(EndEvatorState.L1));
-    // driverXbox.x().onTrue(m_endevator.setTo(EndEvatorState.L2));
-    // driverXbox.a().onTrue(m_endevator.setTo(EndEvatorState.L3));
-    // driverXbox.b().onTrue(m_endevator.setTo(EndEvatorState.L4));
+    driverXbox.rightBumper().onTrue(m_endevator.setTo(EndEvatorState.L1));
+    driverXbox.leftBumper().onTrue(m_endevator.setTo(EndEvatorState.L2));
+    driverXbox.leftTrigger().onTrue(m_endevator.setTo(EndEvatorState.L3));
+    driverXbox.rightTrigger().and(m_endevator.hasCoralSupplier).and(m_endevator.isNotAt(EndEvatorState.L4)).and(m_endevator.notatElevatorTargetPosition(EndEvatorState.L4)).onTrue(m_endevator.setTo(EndEvatorState.L4));
+    driverXbox.rightTrigger().and(m_endevator.hasCoralSupplier).and(m_endevator.isAt(EndEvatorState.L4)).and(m_endevator.atElevatorTargetPosition(EndEvatorState.L4)).onTrue(m_endevator.setTo(EndEvatorState.L4_Score));
+
+    driverXbox.rightTrigger().and(m_endevator.hasNoCoralSupplier).onTrue(m_endevator.setTo(EndEvatorState.CORAL_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
+    driverXbox.start().onTrue(m_endevator.setTo(EndEvatorState.STOW));
 
     driverXbox.a().onTrue(m_ballintake.setTo(BallIntakeState.INTAKE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
     driverXbox.b().onTrue(m_ballintake.setTo(BallIntakeState.SCORE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
@@ -124,12 +128,13 @@ public class RobotContainer {
     // driverXbox.b().and(m_endevator.coralSupplier);
 
     // driverXbox.a().onTrue(m_endevator.moveElevatorTo(ElevatorState.L2));
-    // driverXbox.b().and(() -> m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));
+    // driverXbox.b().and(() ->
+    // m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));
 
-    driverXbox.start().whileTrue(Commands.none());
-    driverXbox.back().whileTrue(Commands.none());
-    driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-    driverXbox.rightBumper().onTrue(drivebase.goSlow()).onFalse(drivebase.goFast());
+
+    driverXbox.back().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    // driverXbox.rightBumper().onTrue(drivebase.goSlow()).onFalse(drivebase.goFast());
 
   }
 
