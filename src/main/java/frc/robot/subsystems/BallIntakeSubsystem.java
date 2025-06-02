@@ -131,14 +131,16 @@ public class BallIntakeSubsystem extends SubsystemBase {
                 moveRollerByPower(BallIntakeConstants.bi_idle_power);
             }
             case HOLD -> {
-                if (isCanAlgaeDetected()){
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_stow_position);
                 moveRollerByPower(BallIntakeConstants.bi_hold_power);
-                }
+            
             }
             case INTAKE ->{
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_intake_position);
                 moveRollerByPower(BallIntakeConstants.bi_intake_power);
+                if (isCanAlgaeDetected()){
+                    state = BallIntakeState.HOLD;
+                }
             }
             case SCORE ->{
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_score_position);
