@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.CoralIntakeConstants;
+import frc.robot.Constants.EndeffectorIntakeConstants;
 import frc.robot.Constants.EndevatorConstants;
 
 public class EndEvatorSubsystem extends SubsystemBase {
@@ -43,8 +43,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
     /*
      * Coral CANRange
      */
-    static CANrange coral_range = new CANrange(CoralIntakeConstants.ci_coral_range_id);
+    static CANrange coral_range = new CANrange(EndeffectorIntakeConstants.ei_coral_range_id);
     static CANrangeConfiguration coral_range_config = new CANrangeConfiguration();
+    /*
+     * Algae CANRange
+     */
+    static CANrange algae_range = new CANrange(EndeffectorIntakeConstants.ei_algae_range_id);
+    static CANrangeConfiguration algae_range_config = new CANrangeConfiguration();
 
     // Required initialization crap
     public void initialize() {
@@ -99,13 +104,18 @@ public class EndEvatorSubsystem extends SubsystemBase {
         /*
          * Coral CANRange Config
          */
-        coral_range_config.ProximityParams.ProximityThreshold = CoralIntakeConstants.ci_coral_threshhold;
+        coral_range_config.ProximityParams.ProximityThreshold = EndeffectorIntakeConstants.ei_coral_threshhold;
+        /*
+         * Algae CANRange Config
+         */
+        algae_range_config.ProximityParams.ProximityThreshold = EndeffectorIntakeConstants.ei_algae_threshhold;
         /*
          * Apply Configs
          */
         elevator_motor.getConfigurator().apply(elevator_motor_config);
         endeffector_pivot.getConfigurator().apply(endeffector_pivot_config);
         coral_range.getConfigurator().apply(coral_range_config);
+        algae_range.getConfigurator().apply(algae_range_config);
         System.out.println("ElevatorSubsystem Initialized");
     }
 
@@ -208,13 +218,17 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public Boolean readyToStow() { // TODO: Make this serve a real purpose
         return getCurrentState() == (EndEvatorState.L2);
     }
+
     public BooleanSupplier coralSupplier = () -> hasCoral();
+
     public Boolean hasCoral() { // TODO: Make this serve a real purpose
-        return false;
+        return coral_range.getIsDetected(false).getValue();
     }
-    public BooleanSupplier algaeSupplier  = () -> hasAlgae();
+
+    public BooleanSupplier algaeSupplier = () -> hasAlgae();
+
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
-        return true;
+        return algae_range.getIsDetected(false).getValue();
     }
 
     // State Machine Garbage

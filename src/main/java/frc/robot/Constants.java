@@ -191,40 +191,44 @@ public final class Constants {
     public static final double antenna_ball_detection_current = 11;
   }
 
-  public static class CoralIntakeConstants {
+  public static class EndeffectorIntakeConstants {
     /*
      * CAN IDs
      */
-    public static final int ci_left_motor_id = 53;
-    public static final int ci_top_motor_id = 54;
-    public static final int ci_right_motor_id = 55;
-    public static final int ci_coral_range_id = 56;
+    public static final int ei_left_motor_id = 53;
+    public static final int ei_top_motor_id = 54;
+    public static final int ei_right_motor_id = 55;
+    public static final int ei_coral_range_id = 56;
+    public static final int ei_algae_range_id = 58;
+
     /*
      * Powers for Various Tasks
      */
     // Idle
-    public static final double ci_idle_power = 0.125;
+    public static final double ei_idle_power = 0.125;
     // Intaking
-    public static final double ci_coral_floor_intake_power = 0.5;
-    public static final double ci_coral_coral_station_intake_power = 0.65;
-    public static final double ci_algae_intake_power = -0.4; // Takes ball from reef
-    public static final double ci_algae_floor_intake_power = -1;
-    public static final double ci_algae_floor_intake_top_roller_power = 0.9;
+    public static final double ei_coral_floor_intake_power = 0.5;
+    public static final double ei_coral_coral_station_intake_power = 0.65;
+    public static final double ei_algae_intake_power = -0.4; // Takes ball from reef
+    public static final double ei_algae_floor_intake_power = -1;
+    public static final double ei_algae_floor_intake_top_roller_power = 0.9;
     // L1 Score
-    public static final double ci_L1_score_power = -0.1;
+    public static final double ei_L1_score_power = -0.1;
     // L2 Score
-    public static final double ci_L2_score_power = -0.25;
+    public static final double ei_L2_score_power = -0.25;
     // L3 Score
-    public static final double ci_L3_score_power = -0.25;
+    public static final double ei_L3_score_power = -0.25;
     // L4 Score
-    public static final double ci_L4_score_outtake_power = 0.4;
+    public static final double ei_L4_score_outtake_power = 0.4;
     // Barge Score
-    public static final double ci_teleop_barge_score_power = 1; // Outtake ball
-    public static final double ci_auto_barge_score_power = 0.75; // Outtake ball
+    public static final double ei_teleop_barge_score_power = 1; // Outtake ball
+    public static final double ei_auto_barge_score_power = 0.75; // Outtake ball
     // Processor Score
-    public static final double ci_processor_score_power = 0.4;
+    public static final double ei_processor_score_power = 0.4;
     // Detection Threshholds
-    public static final double ci_coral_threshhold = 0.7; //TODO: FIX
+    public static final double ei_coral_threshhold =  0.09;
+    public static final double ei_algae_threshhold = 0.7; //TODO: FIX
+
   }
 
 }
