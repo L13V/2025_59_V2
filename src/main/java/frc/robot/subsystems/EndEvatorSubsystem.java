@@ -376,6 +376,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveElevator(EndevatorConstants.coral_floor_pickup_height);
                 moveEndeffector(EndevatorConstants.coral_floor_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_home);
+                intaking(EndeffectorIntakeConstants.ei_coral_floor_intake_power);
             }
             case ALGAE_FLOOR_INTAKE -> {
                 moveElevator(EndevatorConstants.algae_floor_pickup_height);
