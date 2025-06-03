@@ -123,41 +123,48 @@ public class RobotContainer {
     /*
      * L2
      */
-    driverXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier)
-        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isNotAt(EndEvatorState.L2))
+    driverXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isNotAt(EndEvatorState.L2))
+        .and(m_endevator.isNotAt(EndEvatorState.L2_Score))
         .onTrue(m_endevator.setTo(EndEvatorState.L2));
-    driverXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier)
-        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L2))
+    driverXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isAt(EndEvatorState.L2))
         .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L2_height))
         .onTrue(m_endevator.setTo(EndEvatorState.L2_Score));
     /*
      * L3
      */
-    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
-        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isNotAt(EndEvatorState.L3))
+    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isNotAt(EndEvatorState.L3))
+        .and(m_endevator.isNotAt(EndEvatorState.L3_Score))
         .onTrue(m_endevator.setTo(EndEvatorState.L3));
-    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
-        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L3))
+    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isAt(EndEvatorState.L3))
         .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L3_height))
         .onTrue(m_endevator.setTo(EndEvatorState.L3_Score));
     /*
      * L4
      */
-    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
-        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isNotAt(EndEvatorState.L4))
+    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.hasNoAlgaeSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.L4))
         .and(m_endevator.notatElevatorTargetPosition(EndevatorConstants.L4_height))
         .onTrue(m_endevator.setTo(EndEvatorState.L4));
-    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
-        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L4))
+    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isAt(EndEvatorState.L4))
         .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L4_height))
         .onTrue(m_endevator.setTo(EndEvatorState.L4_Score));
     /*
+     * Barge Stuff
+     */
+    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithAlgaeSupplier).and(m_endevator.hasNoCoralSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.FLICK)).onTrue(m_endevator.setTo(EndEvatorState.BARGE));
+    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithAlgaeSupplier).and(m_endevator.hasNoCoralSupplier)
+        .and(m_endevator.isAt(EndEvatorState.BARGE))
+        .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.barge_height))
+        .onTrue(m_endevator.setTo(EndEvatorState.FLICK));
+    /*
      * Floor Intakes
      */
-    driverXbox.rightTrigger().and(m_endevator.notReadyToRaiseWithCoralSupplier)
+    driverXbox.rightTrigger().and(m_endevator.notReadyToRaiseWithCoralSupplier).and(m_endevator.hasNoAlgaeSupplier)
         .onTrue(m_endevator.setTo(EndEvatorState.CORAL_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
-    driverXbox.leftTrigger().and(m_endevator.notReadyToRaiseWithAlgaeSupplier)
+    driverXbox.leftTrigger().and(m_endevator.notReadyToRaiseWithAlgaeSupplier).and(m_endevator.hasNoCoralSupplier)
         .onTrue(m_endevator.setTo(EndEvatorState.ALGAE_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
+        
     /*
      * Stow
      */
@@ -167,7 +174,13 @@ public class RobotContainer {
      */
     driverXbox.a().onTrue(m_ballintake.setTo(BallIntakeState.INTAKE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
     driverXbox.b().onTrue(m_ballintake.setTo(BallIntakeState.SCORE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
-
+    /*
+     * Reef Intake
+     */
+    driverXbox.rightBumper().and(m_endevator.hasNoAlgaeSupplier).and(m_endevator.hasNoCoralSupplier)
+        .onTrue(m_endevator.setTo(EndEvatorState.LOW_ALGAE_INTAKE));
+    driverXbox.leftBumper().and(m_endevator.hasNoAlgaeSupplier).and(m_endevator.hasNoCoralSupplier)
+        .onTrue(m_endevator.setTo(EndEvatorState.HIGH_ALGAE_INTAKE));
     // driverXbox.b().and(m_endevator.coralSupplier);
 
     // driverXbox.a().onTrue(m_endevator.moveElevatorTo(ElevatorState.L2));

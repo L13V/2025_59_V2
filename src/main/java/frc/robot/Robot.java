@@ -92,7 +92,7 @@ public class Robot extends TimedRobot {
     switch (state) {
       case INTAKING -> {
         if (m_endevator.readyToRaiseWithCoral()) {
-          // state = OverallRobotState.ENDEFFECTOR_CORAL;
+          state = OverallRobotState.ENDEFFECTOR_CORAL;
         } else if (m_endevator.readyToRaiseWithAlgae()) {
           state = OverallRobotState.ENDEFFECTOR_ALGAE;
         }

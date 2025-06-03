@@ -131,8 +131,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
         endeffector_pivot.getConfigurator().apply(endeffector_pivot_config);
         coral_range.getConfigurator().apply(coral_range_config);
         algae_range.getConfigurator().apply(algae_range_config);
+        state = EndEvatorState.STOW;
         System.out.println("ElevatorSubsystem Initialized");
-        state = EndEvatorState.STARTING;
     }
 
     public double initial_endeffector_position = 0.0;
@@ -153,7 +153,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
         HIGH_ALGAE_INTAKE,
         LOW_ALGAE_INTAKE,
         BARGE,
-        FLICK
+        FLICK,
+        FLICK_SCORE
     }
     /*
      * All state machine interaction and reading
@@ -243,6 +244,15 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     public BooleanSupplier notatElevatorTargetPosition(double position) {
         return () -> (!elevatorAtTargetPosition(position).getAsBoolean());
+    }
+
+    public BooleanSupplier endeffectorAtTargetPosition(double position) {
+        return () -> (getEndeffectorCurrentPosition() <= position + 7)
+                && (getEndeffectorCurrentPosition() >= position - 7);
+    }
+
+    public BooleanSupplier notatEndeffectorTargetPosition(double position) {
+        return () -> (!endeffectorAtTargetPosition(position).getAsBoolean());
     }
     /*
      * Coral Power function
@@ -429,12 +439,26 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
             case FLICK -> {
+                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_idle_power);
+                moveElevator(EndevatorConstants.barge_height);
+                moveEndeffector(EndevatorConstants.barge_flick_angle, 1);
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
+                if (endeffectorAtTargetPosition(EndevatorConstants.barge_flick_angle).getAsBoolean()) {
+                    state = EndEvatorState.FLICK_SCORE;
+                }
+
+            }
+            case FLICK_SCORE -> {
                 setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_teleop_barge_score_power);
                 moveElevator(EndevatorConstants.barge_height);
-                moveEndeffector(EndevatorConstants.barge_flick_angle, 0);
+                moveEndeffector(EndevatorConstants.barge_flick_angle, 1);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
-            default -> throw new IllegalArgumentException("Unexpected value: " + state);
+            default -> {
+                moveElevator(0);
+                moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_home);
+            }
 
         }
         SmartDashboard.putString("EndEvator State", state.toString());
