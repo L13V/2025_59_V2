@@ -23,7 +23,6 @@ import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 import java.io.File;
 // import frc.robot.Robot.OverallRobotState;
 
-
 import swervelib.SwerveInputStream;
 
 /**
@@ -44,7 +43,6 @@ public class RobotContainer {
   private final EndEvatorSubsystem m_endevator = new EndEvatorSubsystem();
   private final BallIntakeSubsystem m_ballintake = new BallIntakeSubsystem();
   // private final Robot m_robot = new Robot();
-
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -117,17 +115,56 @@ public class RobotContainer {
       // );
 
     }
-
-    driverXbox.rightBumper().and(m_endevator.readyToRaiseWithCoralSupplier).onTrue(m_endevator.setTo(EndEvatorState.L1));
-    driverXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier).onTrue(m_endevator.setTo(EndEvatorState.L2));
-    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).onTrue(m_endevator.setTo(EndEvatorState.L3));
-    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isNotAt(EndEvatorState.L4)).and(m_endevator.notatElevatorTargetPosition(EndevatorConstants.L4_height)).onTrue(m_endevator.setTo(EndEvatorState.L4));
-    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L4)).and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L4_height)).onTrue(m_endevator.setTo(EndEvatorState.L4_Score));
-
-    driverXbox.rightTrigger().and(m_endevator.notReadyToRaiseWithCoralSupplier).onTrue(m_endevator.setTo(EndEvatorState.CORAL_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
-    driverXbox.leftTrigger().and(m_endevator.notReadyToRaiseWithAlgaeSupplier).onTrue(m_endevator.setTo(EndEvatorState.ALGAE_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
+    /*
+     * L1
+     */
+    driverXbox.rightBumper().and(m_endevator.readyToRaiseWithCoralSupplier)
+        .onTrue(m_endevator.setTo(EndEvatorState.L1));
+    /*
+     * L2
+     */
+    driverXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isNotAt(EndEvatorState.L2))
+        .onTrue(m_endevator.setTo(EndEvatorState.L2));
+    driverXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L2))
+        .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L2_height))
+        .onTrue(m_endevator.setTo(EndEvatorState.L2_Score));
+    /*
+     * L3
+     */
+    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isNotAt(EndEvatorState.L3))
+        .onTrue(m_endevator.setTo(EndEvatorState.L3));
+    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L3))
+        .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L3_height))
+        .onTrue(m_endevator.setTo(EndEvatorState.L3_Score));
+    /*
+     * L4
+     */
+    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isNotAt(EndEvatorState.L4))
+        .and(m_endevator.notatElevatorTargetPosition(EndevatorConstants.L4_height))
+        .onTrue(m_endevator.setTo(EndEvatorState.L4));
+    driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier)
+        .and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L4))
+        .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L4_height))
+        .onTrue(m_endevator.setTo(EndEvatorState.L4_Score));
+    /*
+     * Floor Intakes
+     */
+    driverXbox.rightTrigger().and(m_endevator.notReadyToRaiseWithCoralSupplier)
+        .onTrue(m_endevator.setTo(EndEvatorState.CORAL_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
+    driverXbox.leftTrigger().and(m_endevator.notReadyToRaiseWithAlgaeSupplier)
+        .onTrue(m_endevator.setTo(EndEvatorState.ALGAE_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
+    /*
+     * Stow
+     */
     driverXbox.start().onTrue(m_endevator.setTo(EndEvatorState.STOW));
-
+    /*
+     * Ball Intake
+     */
     driverXbox.a().onTrue(m_ballintake.setTo(BallIntakeState.INTAKE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
     driverXbox.b().onTrue(m_ballintake.setTo(BallIntakeState.SCORE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));
 
@@ -137,9 +174,9 @@ public class RobotContainer {
     // driverXbox.b().and(() ->
     // m_endevator.readyToStow()).onTrue(m_endevator.setTo(ElevatorState.STOW));
 
-
     driverXbox.back().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock,
+    // drivebase).repeatedly());
     // driverXbox.rightBumper().onTrue(drivebase.goSlow()).onFalse(drivebase.goFast());
 
   }
