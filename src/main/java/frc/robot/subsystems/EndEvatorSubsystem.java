@@ -53,6 +53,12 @@ public class EndEvatorSubsystem extends SubsystemBase {
      */
     static CANrange algae_range = new CANrange(EndeffectorIntakeConstants.ei_algae_range_id);
     static CANrangeConfiguration algae_range_config = new CANrangeConfiguration();
+    /*
+     * Coral Intake 
+     */
+    static TalonFX right_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_right_motor_id);
+    static TalonFX top_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_top_motor_id);
+    static TalonFX left_motor_T_follower = new TalonFX(EndeffectorIntakeConstants.ei_left_motor_id);
 
     public double targetElevatorHeight = 0;
 
