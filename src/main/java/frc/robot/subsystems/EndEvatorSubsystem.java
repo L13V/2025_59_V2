@@ -154,7 +154,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
         LOW_ALGAE_INTAKE,
         BARGE,
         FLICK,
-        FLICK_SCORE
+        FLICK_SCORE,
+        PROCESSOR
     }
     /*
      * All state machine interaction and reading
@@ -452,6 +453,12 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_teleop_barge_score_power);
                 moveElevator(EndevatorConstants.barge_height);
                 moveEndeffector(EndevatorConstants.barge_flick_angle, 1);
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
+            }
+            case PROCESSOR -> {
+                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_processor_score_power);
+                moveElevator(EndevatorConstants.algae_processor_height);
+                moveEndeffector(EndevatorConstants.algae_processor_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
             default -> {

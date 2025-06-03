@@ -216,7 +216,7 @@ public final class Constants {
     public static final double ei_coral_floor_intake_power = 0.5;
     public static final double ei_coral_coral_station_intake_power = 0.65;
     public static final double ei_algae_intake_power = -0.4; // Takes ball from reef
-    public static final double ei_algae_idle_power = -0.125; // Takes ball from reef
+    public static final double ei_algae_idle_power = -0.17; // Takes ball from reef
     public static final double ei_algae_floor_intake_power = -1;
     public static final double ei_algae_floor_intake_top_roller_power = 0.9;
     // L1 Score

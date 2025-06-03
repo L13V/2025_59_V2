@@ -22,7 +22,7 @@ public class ClimbSubsystem extends SubsystemBase {
         CLIMB,
     }
 
-    public ClimbStates state; 
+    public ClimbStates state = ClimbStates.STOW; 
     public void setState(ClimbStates setstateto){
         state = setstateto;
     }

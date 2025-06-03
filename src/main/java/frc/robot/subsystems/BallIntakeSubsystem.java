@@ -16,6 +16,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,38 +25,32 @@ import frc.robot.Constants.BallIntakeConstants;
 public class BallIntakeSubsystem extends SubsystemBase {
 
     // Pivot Motor and PiD
-    ClimbSubsystem m_climb_subsystem = new ClimbSubsystem();
+    // ClimbSubsystem m_climb_subsystem = new ClimbSubsystem();
     private final SparkMax PivotMotor = new SparkMax(BallIntakeConstants.bi_pivot_motor_id, MotorType.kBrushless);
     private final SparkClosedLoopController pid = PivotMotor.getClosedLoopController();
 
     // Roller Motor
     private final TalonFX rollerMotor_right = new TalonFX(BallIntakeConstants.bi_roller_motor_id);
 
-    // Booelan
-    private boolean Balldetected = false;
-
-    // Through Board Encoder
+    // Through Bore Encoder
     private final AbsoluteEncoder abs_encoder = PivotMotor.getAbsoluteEncoder();
     SparkMaxConfig config = new SparkMaxConfig();
 
     //
-    static CANrange algaeCanRange = new CANrange(BallIntakeConstants.bi_range_id);
-    static final double PRINT_PERIOD = 0.5;
+    static CANrange algae_range = new CANrange(BallIntakeConstants.bi_range_id);
+    static CANrangeConfiguration algae_range_config = new CANrangeConfiguration();
 
     public BallIntakeSubsystem() {
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         PivotMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-
-        CANrangeConfiguration configAlgae = new CANrangeConfiguration();
-        configAlgae.ProximityParams.MinSignalStrengthForValidMeasurement = 2000; // If CANrange has a signal strength of
-                                                                                 // at least 2000, it is a valid
-                                                                                 // measurement.
-        configAlgae.ProximityParams.ProximityThreshold = 0.3; // If CANrange detects an object within 0.1 meters, it
-                                                              // will trigger the "isDetected" signal.
-        configAlgae.ToFParams.UpdateMode = UpdateModeValue.ShortRange100Hz; // Make the CANrange update as fast as
-                                                                            // possible at 100 Hz. This requires
-                                                                            // short-range mode.
-        algaeCanRange.getConfigurator().apply(configAlgae);
+        /* 
+         * Back Ball Intake Algae CANRange Config
+         */
+        algae_range.getConfigurator().refresh(algae_range_config);
+        algae_range_config.ProximityParams.MinSignalStrengthForValidMeasurement = 2000;
+        algae_range_config.ProximityParams.ProximityThreshold = 0.3;
+        algae_range_config.ToFParams.UpdateMode = UpdateModeValue.ShortRange100Hz;
+        algae_range.getConfigurator().apply(algae_range_config);
     }
 
     public enum BallIntakeState {
@@ -92,18 +87,8 @@ public class BallIntakeSubsystem extends SubsystemBase {
         return state;
     }
 
-    public boolean isCanAlgaeDetected() {
-
-        var distance = algaeCanRange.getDistance();
-        var signalStrength = algaeCanRange.getSignalStrength();
-        /**
-         * Get the isDetected StatusSignalValue without refreshing
-         */
-        var isDetected = algaeCanRange.getIsDetected(false);
-        /* This time wait for the signal to reduce latency */
-        isDetected.waitForUpdate(PRINT_PERIOD);
-
-        return isDetected.getValue();
+    public boolean hasAlgae() {
+        return algae_range.getIsDetected(true).getValue();
     }
 
     public void moveRollerByPower(double power) {
@@ -130,8 +115,8 @@ public class BallIntakeSubsystem extends SubsystemBase {
     public void periodic() {
         switch (state) {
             case STOW -> {
-                if (isCanAlgaeDetected()) {
-                    m_climb_subsystem.ballstop();
+                if (hasAlgae()) {
+                    // m_climb_subsystem.ballstop();
                     moveIntakeToPosition(BallIntakeConstants.bi_algae_stow_position);
                     moveRollerByPower(BallIntakeConstants.bi_hold_power);
                 } else {
@@ -148,8 +133,8 @@ public class BallIntakeSubsystem extends SubsystemBase {
             case INTAKE -> {
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_intake_position);
                 moveRollerByPower(BallIntakeConstants.bi_intake_power);
-                m_climb_subsystem.ballstop();
-                if (isCanAlgaeDetected()) {
+                // m_climb_subsystem.ballstop();
+                if (hasAlgae()) {
                     state = BallIntakeState.STOW;
                 }
             }

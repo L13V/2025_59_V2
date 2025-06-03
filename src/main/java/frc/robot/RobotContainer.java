@@ -158,13 +158,18 @@ public class RobotContainer {
         .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.barge_height))
         .onTrue(m_endevator.setTo(EndEvatorState.FLICK));
     /*
+     * processor 
+     */
+    driverXbox.leftTrigger().and(m_endevator.readyToRaiseWithAlgaeSupplier).and(m_endevator.hasNoCoralSupplier)
+        .onTrue(m_endevator.setTo(EndEvatorState.PROCESSOR));
+    /*
      * Floor Intakes
      */
     driverXbox.rightTrigger().and(m_endevator.notReadyToRaiseWithCoralSupplier).and(m_endevator.hasNoAlgaeSupplier)
         .onTrue(m_endevator.setTo(EndEvatorState.CORAL_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
     driverXbox.leftTrigger().and(m_endevator.notReadyToRaiseWithAlgaeSupplier).and(m_endevator.hasNoCoralSupplier)
         .onTrue(m_endevator.setTo(EndEvatorState.ALGAE_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
-        
+
     /*
      * Stow
      */
