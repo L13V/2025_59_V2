@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -58,7 +59,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      */
     static TalonFX right_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_right_motor_id);
     static TalonFX top_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_top_motor_id);
-    static TalonFX left_motor_T_follower = new TalonFX(EndeffectorIntakeConstants.ei_left_motor_id);
+    static TalonFX left_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_left_motor_id);
 
     public double targetElevatorHeight = 0;
 
@@ -120,6 +121,9 @@ public class EndEvatorSubsystem extends SubsystemBase {
          * Algae CANRange Config
          */
         algae_range_config.ProximityParams.ProximityThreshold = EndeffectorIntakeConstants.ei_algae_threshhold;
+     /*
+         * Coral Intake
+         */
         /*
          * Apply Configs
          */
@@ -238,6 +242,45 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public BooleanSupplier notatElevatorTargetPosition(double position) {
         return () -> (!elevatorAtTargetPosition(position).getAsBoolean());
     }
+    /*
+     * Coral Power function
+     */
+    static void intaking (double Power){
+        if(Power > Math.abs(1) ){
+            Power = 0;
+        }
+        else{
+            right_motor_T.set(Power);
+            left_motor_T.set(Power - Math.abs(0.05));
+            top_motor_T.set(Power + 0.05);
+            
+        }
+    }
+    static void placing(double placingPower){
+        right_motor_T.set(placingPower);
+        left_motor_T.set(placingPower);
+    }
+    static void idle(double idlePower){
+        right_motor_T.set(idlePower);
+        left_motor_T.set(idlePower);
+        top_motor_T.set(idlePower);
+    }
+    static void algae_Flick(double flick){
+        top_motor_T.set(flick);
+    }
+
+     static public double getcurrent_right(){
+        return right_motor_T.getStatorCurrent().refresh().getValueAsDouble();
+    }
+    static public double getcurrent_left(){
+        return left_motor_T.getStatorCurrent().refresh().getValueAsDouble();
+    }
+    static public double getMotorCurrent(){
+        return right_motor_T.getTorqueCurrent().refresh().getValueAsDouble();
+    }
+    static public double getTopMotorCurrent(){
+        return top_motor_T.getStatorCurrent().refresh().getValueAsDouble();
+    }
 
     /*
      * Booleans for controlling binds.
@@ -341,6 +384,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveElevator(EndevatorConstants.coral_floor_pickup_height);
                 moveEndeffector(EndevatorConstants.coral_floor_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_home);
+                intaking(EndeffectorIntakeConstants.ei_coral_floor_intake_power);
             }
             case ALGAE_FLOOR_INTAKE -> {
                 moveElevator(EndevatorConstants.algae_floor_pickup_height);
