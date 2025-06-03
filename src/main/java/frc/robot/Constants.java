@@ -53,9 +53,9 @@ public final class Constants {
 
   public static class ClimbConstants {
     public static final int climb_motor_id = 62;
-    public static final double climb_stow_position = 1.55;
+    public static final double climb_climbing_limit = 1.55;
     public static final double climb_deployed_position = 3.5;
-    public static final double climb_climbing_limit = 0.4;
+    public static final double climb_stow_position = 0.4;
   }
 
   public static class BallIntakeConstants { // bi is Ball Intake
