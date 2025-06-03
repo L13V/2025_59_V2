@@ -230,7 +230,7 @@ public final class Constants {
     public static final double ei_processor_score_power = 0.4;
     // Detection Threshholds
     public static final double ei_coral_threshhold =  0.09;
-    public static final double ei_algae_threshhold = 0.7; //TODO: FIX
+    public static final double ei_algae_threshhold = 0.12; //TODO: FIX
 
   }
 

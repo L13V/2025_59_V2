@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.EndEvatorSubsystem;
+import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -29,13 +32,13 @@ public class Robot extends TimedRobot {
   private Timer disabledTimer;
   private final EndEvatorSubsystem m_endevator = new EndEvatorSubsystem();
 
-  public enum RobotState {
+  public enum OverallRobotState {
     INTAKING,
     ENDEFFECTOR_ALGAE,
     ENDEFFECTOR_CORAL
   }
 
-  public RobotState state = RobotState.INTAKING;
+  public OverallRobotState state = OverallRobotState.INTAKING;
 
   public Robot() {
     instance = this;
@@ -88,20 +91,23 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     switch (state) {
       case INTAKING -> {
-        if (m_endevator.hasCoral()) {
-          state = RobotState.ENDEFFECTOR_CORAL;
-        } else if (m_endevator.hasAlgae()) {
-          state = RobotState.ENDEFFECTOR_ALGAE;
+        if (m_endevator.readyToRaiseWithCoral()) {
+          // state = OverallRobotState.ENDEFFECTOR_CORAL;
+        } else if (m_endevator.readyToRaiseWithAlgae()) {
+          state = OverallRobotState.ENDEFFECTOR_ALGAE;
         }
       }
       case ENDEFFECTOR_ALGAE -> {
         if (!m_endevator.hasAlgae()) {
-          state = RobotState.INTAKING;
+          state = OverallRobotState.INTAKING;
+        }
+        if (m_endevator.readyToRaiseWithCoral()) {
+          state = OverallRobotState.INTAKING;
         }
       }
       case ENDEFFECTOR_CORAL -> {
         if (!m_endevator.hasCoral()) {
-          state = RobotState.INTAKING;
+          state = OverallRobotState.INTAKING;
         }
       }
       default -> throw new IllegalArgumentException("Unexpected value: " + state);
@@ -196,4 +202,15 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
   }
+
+  public OverallRobotState getCurrentState() {
+    return state;
+  }
+
+  public BooleanSupplier isAt(OverallRobotState state) {
+    return () -> getCurrentState() == state;
+  }
+  public BooleanSupplier isNotAt(OverallRobotState state) {
+    return () -> getCurrentState() != state;
+}
 }

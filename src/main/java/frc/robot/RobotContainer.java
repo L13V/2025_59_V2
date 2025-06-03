@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+// import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -19,8 +20,9 @@ import frc.robot.subsystems.BallIntakeSubsystem;
 import frc.robot.subsystems.EndEvatorSubsystem;
 import frc.robot.subsystems.BallIntakeSubsystem.BallIntakeState;
 import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
-
 import java.io.File;
+// import frc.robot.Robot.OverallRobotState;
+
 
 import swervelib.SwerveInputStream;
 
@@ -41,6 +43,8 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final EndEvatorSubsystem m_endevator = new EndEvatorSubsystem();
   private final BallIntakeSubsystem m_ballintake = new BallIntakeSubsystem();
+  // private final Robot m_robot = new Robot();
+
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -121,6 +125,7 @@ public class RobotContainer {
     driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithCoralSupplier).and(m_endevator.isNotAt(EndEvatorState.CORAL_FLOOR_INTAKE)).and(m_endevator.isAt(EndEvatorState.L4)).and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.L4_height)).onTrue(m_endevator.setTo(EndEvatorState.L4_Score));
 
     driverXbox.rightTrigger().and(m_endevator.notReadyToRaiseWithCoralSupplier).onTrue(m_endevator.setTo(EndEvatorState.CORAL_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
+    driverXbox.leftTrigger().and(m_endevator.notReadyToRaiseWithAlgaeSupplier).onTrue(m_endevator.setTo(EndEvatorState.ALGAE_FLOOR_INTAKE)).onFalse(m_endevator.setTo(EndEvatorState.STOW));
     driverXbox.start().onTrue(m_endevator.setTo(EndEvatorState.STOW));
 
     driverXbox.a().onTrue(m_ballintake.setTo(BallIntakeState.INTAKE)).onFalse(m_ballintake.setTo(BallIntakeState.STOW));

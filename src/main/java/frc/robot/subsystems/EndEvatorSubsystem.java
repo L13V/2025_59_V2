@@ -128,6 +128,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
         coral_range.getConfigurator().apply(coral_range_config);
         algae_range.getConfigurator().apply(algae_range_config);
         System.out.println("ElevatorSubsystem Initialized");
+        state = EndEvatorState.STARTING;
     }
 
     public double initial_endeffector_position = 0.0;
@@ -152,7 +153,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * All state machine interaction and reading
      */
 
-    public EndEvatorState state = EndEvatorState.STARTING;
+    public EndEvatorState state;
 
     /**
      * FUNCTION for setting the elevator state machine to another state.
@@ -254,7 +255,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return coral_range.getIsDetected(true).getValue();
     }
 
-    public Boolean readyToRaiseWithCoral() {
+    public Boolean 
+    readyToRaiseWithCoral() {
         return coral_range.getIsDetected(true).getValue() && state != EndEvatorState.CORAL_FLOOR_INTAKE;
     }
 
@@ -262,11 +264,17 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * Algae
      */
     public BooleanSupplier hasAlgaeSupplier = () -> hasAlgae();
+    public BooleanSupplier readyToRaiseWithAlgaeSupplier = () -> readyToRaiseWithCoral();
     public BooleanSupplier hasNoAlgaeSupplier = () -> !hasAlgae();
+    public BooleanSupplier notReadyToRaiseWithAlgaeSupplier = () -> !readyToRaiseWithCoral();
+
 
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
-        // return algae_range.getIsDetected(true).getValue();
-        return false;
+        return algae_range.getIsDetected(true).getValue();
+    }
+    
+    public Boolean readyToRaiseWithAlgae() {
+        return algae_range.getIsDetected(true).getValue() && state != EndEvatorState.ALGAE_FLOOR_INTAKE;
     }
 
     /*
