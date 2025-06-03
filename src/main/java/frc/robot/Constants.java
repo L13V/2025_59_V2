@@ -56,6 +56,9 @@ public final class Constants {
     public static final double climb_climbing_limit = 1.55;
     public static final double climb_deployed_position = 3.5;
     public static final double climb_stow_position = 0.4;
+    public static final double climb_backstop = 1.55;
+    public static final double climb_power = 1;
+
   }
 
   public static class BallIntakeConstants { // bi is Ball Intake
