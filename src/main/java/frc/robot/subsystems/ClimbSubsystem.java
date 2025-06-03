@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants;
 
@@ -19,7 +20,18 @@ public class ClimbSubsystem extends SubsystemBase {
         STOW,
         DEPLOYED,
         CLIMB,
-        BALLINTAKE
+    }
+
+    public ClimbStates state; 
+    public void setState(ClimbStates setstateto){
+        state = setstateto;
+    }
+    public Command setTo(ClimbStates setto){
+        return runOnce(() -> setState(setto));
+    }
+
+    public ClimbStates getCurrentState(){
+        return state;
     }
 
     public void moveClimbByPower(double power){
@@ -48,9 +60,29 @@ public class ClimbSubsystem extends SubsystemBase {
         return climbMotor.getPosition().refresh().getValueAsDouble();
     }
 
-    public void intakingClim (){
+    public void deploy (){
         moveClimbByPosition(ClimbConstants.climb_deployed_position);
     }
-    
+    public void ballstop (){
+        moveClimbByPosition(ClimbConstants.climb_backstop);
+    }
 
+    public void stowPosition (){
+        moveClimbByPosition(ClimbConstants.climb_stow_position);
+    }
+    public void periodic(){
+        switch (state) {
+            case STOW -> {
+                stowPosition();
+            }
+            case CLIMB -> {
+                moveClimbByPower(ClimbConstants.climb_power);
+            }
+            case DEPLOYED -> {
+                deploy();
+                
+            }
+        }
+        
+    }
 }

@@ -24,6 +24,7 @@ import frc.robot.Constants.BallIntakeConstants;
 public class BallIntakeSubsystem extends SubsystemBase {
 
     // Pivot Motor and PiD
+    ClimbSubsystem m_climb_subsystem = new ClimbSubsystem();
     private final SparkMax PivotMotor = new SparkMax(BallIntakeConstants.bi_pivot_motor_id, MotorType.kBrushless);
     private final SparkClosedLoopController pid = PivotMotor.getClosedLoopController();
 
@@ -130,6 +131,7 @@ public class BallIntakeSubsystem extends SubsystemBase {
         switch (state) {
             case STOW -> {
                 if (isCanAlgaeDetected()) {
+                    m_climb_subsystem.ballstop();
                     moveIntakeToPosition(BallIntakeConstants.bi_algae_stow_position);
                     moveRollerByPower(BallIntakeConstants.bi_hold_power);
                 } else {
@@ -146,6 +148,7 @@ public class BallIntakeSubsystem extends SubsystemBase {
             case INTAKE -> {
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_intake_position);
                 moveRollerByPower(BallIntakeConstants.bi_intake_power);
+                m_climb_subsystem.ballstop();
                 if (isCanAlgaeDetected()) {
                     state = BallIntakeState.STOW;
                 }
