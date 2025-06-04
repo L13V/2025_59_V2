@@ -58,6 +58,12 @@ public final class Constants {
     public static final double climb_stow_position = 0.4;
     public static final double climb_backstop = 1.55;
     public static final double climb_power = 1;
+    public static final double climb_slot0_kP = 0.8999999761581421;
+    public static final double climb_slot0_kI = 0.00004999999873689376;
+    public static final double climb_slot0_kD = 0;
+    public static final double climb_sensor_to_mechanism_ratio = 56.076900482177734;
+    public static final double forward_soft_limit = 4.7;
+    public static final double reverse_soft_limit = 0.2;
 
   }
 
@@ -74,7 +80,7 @@ public final class Constants {
     public static final double bi_algae_score_position = 80;
     public static final double bi_climb_position = 182;
     //Sensor Thresholds
-    public static final double bi_algae_threshhold = 0.7; //TODO: FIX
+    public static final double bi_algae_threshhold = 0.7;
     //Power
     public static final double bi_intake_power = 0.4 ; 
     public static final double bi_outtake_power = -0.25 ; 
@@ -216,7 +222,7 @@ public final class Constants {
     public static final double ei_coral_floor_intake_power = 0.5;
     public static final double ei_coral_coral_station_intake_power = 0.65;
     public static final double ei_algae_intake_power = -0.4; // Takes ball from reef
-    public static final double ei_algae_idle_power = -0.17; // Takes ball from reef
+    public static final double ei_algae_idle_power = -0.125; // Takes ball from reef
     public static final double ei_algae_floor_intake_power = -1;
     public static final double ei_algae_floor_intake_top_roller_power = 0.9;
     // L1 Score
@@ -232,7 +238,7 @@ public final class Constants {
     public static final double ei_processor_score_power = 0.4;
     // Detection Threshholds
     public static final double ei_coral_threshhold =  0.09;
-    public static final double ei_algae_threshhold = 0.12; //TODO: FIX
+    public static final double ei_algae_threshhold = 0.12;
 
   }
 

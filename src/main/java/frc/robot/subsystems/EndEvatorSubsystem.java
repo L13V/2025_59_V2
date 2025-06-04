@@ -4,7 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
+
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -55,17 +55,44 @@ public class EndEvatorSubsystem extends SubsystemBase {
     static CANrange algae_range = new CANrange(EndeffectorIntakeConstants.ei_algae_range_id);
     static CANrangeConfiguration algae_range_config = new CANrangeConfiguration();
     /*
-     * Coral Intake 
+     * Coral Intake
      */
     static TalonFX right_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_right_motor_id);
     static TalonFX top_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_top_motor_id);
     static TalonFX left_motor_T = new TalonFX(EndeffectorIntakeConstants.ei_left_motor_id);
 
-    public double targetElevatorHeight = 0;
+    // Initialize ElevatorState Enum, and start at stow
+    public enum EndEvatorState {
+        STOW,
+        STARTING,
+        L1,
+        L2,
+        L2_Score,
+        L3,
+        L3_Score,
+        L4,
+        L4_Score,
+        CORAL_FLOOR_INTAKE,
+        ALGAE_FLOOR_INTAKE,
+        HIGH_ALGAE_INTAKE,
+        LOW_ALGAE_INTAKE,
+        BARGE,
+        FLICK,
+        FLICK_SCORE,
+        PROCESSOR,
+        PROCESSOR_SCORE
+    }
+    /*
+     * All state machine interaction and reading
+     */
 
-    // Required initialization crap
+    public EndEvatorState state = EndEvatorState.STARTING;
+
+    /*
+     * Required initialization crap
+     */
     public void initialize() {
-        System.out.println("ElevatorSubsystem Initialized");
+        System.out.println("EndEvator Initialized");
 
     }
 
@@ -121,9 +148,6 @@ public class EndEvatorSubsystem extends SubsystemBase {
          * Algae CANRange Config
          */
         algae_range_config.ProximityParams.ProximityThreshold = EndeffectorIntakeConstants.ei_algae_threshhold;
-     /*
-         * Coral Intake
-         */
         /*
          * Apply Configs
          */
@@ -131,37 +155,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
         endeffector_pivot.getConfigurator().apply(endeffector_pivot_config);
         coral_range.getConfigurator().apply(coral_range_config);
         algae_range.getConfigurator().apply(algae_range_config);
-        state = EndEvatorState.STOW;
-        System.out.println("ElevatorSubsystem Initialized");
+
     }
 
-    public double initial_endeffector_position = 0.0;
 
-    // Initialize ElevatorState Enum, and start at stow
-    public enum EndEvatorState {
-        STOW,
-        STARTING,
-        L1,
-        L2,
-        L2_Score,
-        L3,
-        L3_Score,
-        L4,
-        L4_Score,
-        CORAL_FLOOR_INTAKE,
-        ALGAE_FLOOR_INTAKE,
-        HIGH_ALGAE_INTAKE,
-        LOW_ALGAE_INTAKE,
-        BARGE,
-        FLICK,
-        FLICK_SCORE,
-        PROCESSOR
-    }
-    /*
-     * All state machine interaction and reading
-     */
-
-    public EndEvatorState state;
 
     /**
      * FUNCTION for setting the elevator state machine to another state.
@@ -169,7 +166,6 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * @param setstateto
      */
     public void setState(EndEvatorState setstateto) {
-        initial_endeffector_position = getEndeffectorCurrentPosition();
         state = setstateto;
 
     }
@@ -255,37 +251,44 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public BooleanSupplier notatEndeffectorTargetPosition(double position) {
         return () -> (!endeffectorAtTargetPosition(position).getAsBoolean());
     }
+
     /*
      * Coral Power function
      */
-    static void intakeCoralWithPower (double Power){
+    static void intakeCoralWithPower(double Power) {
         right_motor_T.set(Power);
         left_motor_T.set(Power - Math.abs(0.1));
         top_motor_T.set((Power + 0.05));
     }
-    static void setSideRollersWithPower(double Power){
+
+    static void setSideRollersWithPower(double Power) {
         right_motor_T.set(Power);
         left_motor_T.set(Power);
     }
-    static void setCoralRollersWithPower(double Power){
+
+    static void setCoralRollersWithPower(double Power) {
         right_motor_T.set(Power);
         left_motor_T.set(Power);
         top_motor_T.set(Power);
     }
-    static void setAlgaeRollerByPower(double flick){
+
+    static void setAlgaeRollerByPower(double flick) {
         top_motor_T.set(flick);
     }
 
-    static public double getcurrent_right(){
+    static public double getcurrent_right() {
         return right_motor_T.getStatorCurrent().refresh().getValueAsDouble();
     }
-    static public double getcurrent_left(){
+
+    static public double getcurrent_left() {
         return left_motor_T.getStatorCurrent().refresh().getValueAsDouble();
     }
-    static public double getMotorCurrent(){
+
+    static public double getMotorCurrent() {
         return right_motor_T.getTorqueCurrent().refresh().getValueAsDouble();
     }
-    static public double getTopMotorCurrent(){
+
+    static public double getTopMotorCurrent() {
         return top_motor_T.getStatorCurrent().refresh().getValueAsDouble();
     }
 
@@ -305,8 +308,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return coral_range.getIsDetected(true).getValue();
     }
 
-    public Boolean 
-    readyToRaiseWithCoral() {
+    public Boolean readyToRaiseWithCoral() {
         return coral_range.getIsDetected(true).getValue() && state != EndEvatorState.CORAL_FLOOR_INTAKE;
     }
 
@@ -318,11 +320,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public BooleanSupplier hasNoAlgaeSupplier = () -> !hasAlgae();
     public BooleanSupplier notReadyToRaiseWithAlgaeSupplier = () -> !readyToRaiseWithAlgae();
 
-
     public Boolean hasAlgae() { // TODO: Make this serve a real purpose
         return algae_range.getIsDetected(true).getValue();
     }
-    
+
     public Boolean readyToRaiseWithAlgae() {
         return algae_range.getIsDetected(true).getValue() && state != EndEvatorState.ALGAE_FLOOR_INTAKE;
     }
@@ -427,14 +428,22 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
             case HIGH_ALGAE_INTAKE -> {
-                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_intake_power);
+                if (hasAlgae()) {
+                    setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_idle_power);
+                } else {
+                    setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_intake_power);
+                }
                 moveElevator(EndevatorConstants.algae_L3_height);
                 moveEndeffector(EndevatorConstants.algae_L3_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
 
             }
             case LOW_ALGAE_INTAKE -> {
-                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_intake_power);
+                if (hasAlgae()) {
+                    setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_idle_power);
+                } else {
+                    setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_intake_power);
+                }
                 moveElevator(EndevatorConstants.algae_L2_height);
                 moveEndeffector(EndevatorConstants.algae_L2_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
@@ -456,10 +465,23 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
             case PROCESSOR -> {
-                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_processor_score_power);
+                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_idle_power);
+                setSideRollersWithPower(0);
                 moveElevator(EndevatorConstants.algae_processor_height);
                 moveEndeffector(EndevatorConstants.algae_processor_angle, 0);
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
+                if (endeffectorAtTargetPosition(EndevatorConstants.algae_processor_angle).getAsBoolean()
+                        && elevatorAtTargetPosition(EndevatorConstants.algae_processor_height).getAsBoolean()) {
+                    state = EndEvatorState.PROCESSOR_SCORE;
+                }
+            }
+            case PROCESSOR_SCORE -> {
+                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_processor_score_power);
+                setSideRollersWithPower(0);
+                moveElevator(EndevatorConstants.algae_processor_height);
+                moveEndeffector(EndevatorConstants.algae_processor_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
+
             }
             default -> {
                 moveElevator(0);
