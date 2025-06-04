@@ -57,7 +57,7 @@ public final class Constants {
     public static final double climb_deployed_position = 3.5;
     public static final double climb_stow_position = 0.4;
     public static final double climb_backstop = 1.55;
-    public static final double climb_power = 1;
+    public static final double climb_power = -1;
     public static final double climb_slot0_kP = 0.8999999761581421;
     public static final double climb_slot0_kI = 0.00004999999873689376;
     public static final double climb_slot0_kD = 0;

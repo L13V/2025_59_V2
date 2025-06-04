@@ -54,7 +54,8 @@ public class BallIntakeSubsystem extends SubsystemBase {
         STOW,
         HOLD,
         INTAKE,
-        SCORE
+        SCORE,
+        CLIMB
     }
 
     public BallIntakeState state = BallIntakeState.STOW;
@@ -138,6 +139,10 @@ public class BallIntakeSubsystem extends SubsystemBase {
             case SCORE -> {
                 moveIntakeToPosition(BallIntakeConstants.bi_algae_score_position);
                 moveRollerByPower(BallIntakeConstants.bi_outtake_power);
+            }
+            case CLIMB -> {
+                moveIntakeToPosition(BallIntakeConstants.bi_climb_position);
+                moveRollerByPower(0);
             }
 
         }
