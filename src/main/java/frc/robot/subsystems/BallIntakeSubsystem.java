@@ -1,8 +1,15 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
+import com.ctre.phoenix6.configs.CommutationConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.AdvancedHallSupportValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.UpdateModeValue;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -18,29 +25,56 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.BallIntakeConstants;
+import frc.robot.Constants.EndevatorConstants;
 
 public class BallIntakeSubsystem extends SubsystemBase {
 
     // Pivot Motor and PiD
     // ClimbSubsystem m_climb_subsystem = new ClimbSubsystem();
-    private final SparkMax PivotMotor = new SparkMax(BallIntakeConstants.bi_pivot_motor_id, MotorType.kBrushless);
-    private final SparkClosedLoopController pid = PivotMotor.getClosedLoopController();
-
+    // private final SparkMax PivotMotor = new
+    // SparkMax(BallIntakeConstants.bi_pivot_motor_id, MotorType.kBrushless);
+    // private final SparkClosedLoopController pid =
+    // PivotMotor.getClosedLoopController();
+    private final TalonFX pivot_motor = new TalonFX(BallIntakeConstants.bi_pivot_motor_id);
+    private final TalonFXConfiguration pivot_motor_config = new TalonFXConfiguration();
+    private final CommutationConfigs pivot_motor_commutation = new CommutationConfigs();
+    private final PositionDutyCycle pivot_motor_PositionDutyCycle = new PositionDutyCycle(
+            BallIntakeConstants.bi_stow_position);
     // Roller Motor
     private final TalonFX rollerMotor_right = new TalonFX(BallIntakeConstants.bi_roller_motor_id);
 
     // Through Bore Encoder
-    private final AbsoluteEncoder abs_encoder = PivotMotor.getAbsoluteEncoder();
-    SparkMaxConfig config = new SparkMaxConfig();
+    // private final AbsoluteEncoder abs_encoder = PivotMotor.getAbsoluteEncoder();
+    // SparkMaxConfig config = new SparkMaxConfig();
 
     //
     static CANrange algae_range = new CANrange(BallIntakeConstants.bi_range_id);
     static CANrangeConfiguration algae_range_config = new CANrangeConfiguration();
 
     public BallIntakeSubsystem() {
-        config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-        PivotMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        /* 
+        /*
+         * Back Ball Intake Pivot Config
+         */
+        pivot_motor.getConfigurator().refresh(pivot_motor_config);
+        pivot_motor_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        pivot_motor_config.Slot0.kP = BallIntakeConstants.bi_slot0_kP;
+        pivot_motor_config.Slot0.kI = BallIntakeConstants.bi_slot0_kI;
+        pivot_motor_config.Slot0.kD = BallIntakeConstants.bi_slot0_kD;
+        pivot_motor_config.Slot0.kA = BallIntakeConstants.bi_slot0_kA;
+        pivot_motor_config.Slot0.kV = BallIntakeConstants.bi_slot0_kV;
+        pivot_motor_config.Slot0.kS = BallIntakeConstants.bi_slot0_kS;
+        pivot_motor_config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        pivot_motor_config.Feedback.FeedbackRemoteSensorID = BallIntakeConstants.bi_pivot_encoder_id;
+        pivot_motor_config.Feedback.RotorToSensorRatio = BallIntakeConstants.bi_rotor_to_sensor_ratio;
+        pivot_motor_config.Feedback.SensorToMechanismRatio = BallIntakeConstants.bi_sensor_to_mechanism_ratio;
+        pivot_motor_config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        pivot_motor_config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        pivot_motor_config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = BallIntakeConstants.bi_fw_soft_limit;
+        pivot_motor_config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = BallIntakeConstants.bi_rev_soft_limit;
+        pivot_motor.getConfigurator().apply(pivot_motor_config);
+
+
+        /*
          * Back Ball Intake Algae CANRange Config
          */
         algae_range.getConfigurator().refresh(algae_range_config);
@@ -103,11 +137,11 @@ public class BallIntakeSubsystem extends SubsystemBase {
     }
 
     public void moveIntakeToPosition(double position) {
-        pid.setReference(position, ControlType.kPosition);
+        pivot_motor.setControl(pivot_motor_PositionDutyCycle.withPosition(position));
     }
 
     public double getPosition() {
-        return abs_encoder.getPosition();
+        return pivot_motor.getPosition().getValueAsDouble();
     }
 
     public void periodic() {
@@ -147,6 +181,7 @@ public class BallIntakeSubsystem extends SubsystemBase {
 
         }
         SmartDashboard.putString("Ball Intake State", state.toString());
+        SmartDashboard.putBoolean("Ball Intake HasAlgae", hasAlgae());
 
     }
 }

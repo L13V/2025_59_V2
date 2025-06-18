@@ -6,7 +6,9 @@ package frc.robot;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -62,6 +64,7 @@ public class Robot extends TimedRobot {
     // let the robot stop
     // immediately when disabled, but then also let it be pushed more
     disabledTimer = new Timer();
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
     if (isSimulation()) {
       DriverStation.silenceJoystickConnectionWarning(true);

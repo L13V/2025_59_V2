@@ -55,7 +55,7 @@ public final class Constants {
     public static final int climb_motor_id = 62;
     public static final double climb_climbing_limit = 1.55;
     public static final double climb_deployed_position = 3.5;
-    public static final double climb_stow_position = 0.4;
+    public static final double climb_stow_position = 0.4 + 0.2;
     public static final double climb_backstop = 1.55;
     public static final double climb_power = -1;
     public static final double climb_slot0_kP = 0.8999999761581421;
@@ -68,24 +68,41 @@ public final class Constants {
   }
 
   public static class BallIntakeConstants { // bi is Ball Intake
+    // PIDs
+    public static final double bi_slot0_kP = 0.009999999776482582;
+    public static final double bi_slot0_kI = 0;
+    public static final double bi_slot0_kD = 0;
+    public static final double bi_slot0_kS = 0;
+    public static final double bi_slot0_kV = 0;
+    public static final double bi_slot0_kA = 0;
     // Motor IDs
     public static final int bi_roller_motor_id = 61;
     public static final int bi_pivot_motor_id = 60;
-    // Sensor IDS
+    // Sensor IDs
     public static final int bi_range_id = 57;
+    // Encoder IDs
+    public static final int bi_pivot_encoder_id = 56;
+
     // Positions
     public static final double bi_stow_position = 65; // No Ball
     public static final double bi_algae_intake_position = 132;
-    public static final double bi_algae_stow_position = 100;
+    public static final double bi_algae_stow_position = 110;
     public static final double bi_algae_score_position = 80;
     public static final double bi_climb_position = 182;
-    //Sensor Thresholds
+    // Sensor Thresholds
     public static final double bi_algae_threshhold = 0.7;
-    //Power
-    public static final double bi_intake_power = 0.4 ; 
-    public static final double bi_outtake_power = -0.25 ; 
-    public static final double bi_idle_power = 0.04 ; 
-    public static final double bi_hold_power = 0.15 ; 
+    // Power
+    public static final double bi_intake_power = 0.4;
+    public static final double bi_outtake_power = -0.25;
+    public static final double bi_idle_power = 0.04;
+    public static final double bi_hold_power = 0.15;
+    // Motor Configs
+    public static final double bi_absolute_sensor_continuity_point = 1;
+    public static final double bi_rotor_to_sensor_ratio = 135;
+    public static final double bi_sensor_to_mechanism_ratio = 0.0027777778450399637;
+    public static final double bi_fw_soft_limit = 180;
+    public static final double bi_rev_soft_limit = 53.25;
+
   }
 
   public static class EndevatorConstants {
@@ -137,8 +154,8 @@ public final class Constants {
      * Elevator heights
      */
     // Stow
-    public static final double coral_stow_height = 18;
-    public static final double algae_stow_height = 22;
+    public static final double coral_stow_height = 5;
+    public static final double algae_stow_height = 9;
     // Floor
     public static final double coral_floor_pickup_height = 1;
     public static final double algae_floor_pickup_height = 11.5;
@@ -157,7 +174,7 @@ public final class Constants {
     public static final double L2_height = 29.88;
     public static final double algae_L2_height = 27;
     // L1
-    public static final double L1_height = 19.1;
+    public static final double L1_height = 19.1 + 1;
     // Coral Station
     public static final double coral_station_auto_height = 24;
     public static final double coral_station_tele_height = 23.5;
@@ -226,7 +243,7 @@ public final class Constants {
     public static final double ei_algae_floor_intake_power = -1;
     public static final double ei_algae_floor_intake_top_roller_power = 0.9;
     // L1 Score
-    public static final double ei_L1_score_power = -0.1;
+    public static final double ei_L1_score_power = -0.16;
     // L2 and L3 Score
     public static final double ei_L2_L3_score_power = -0.25;
     // L4 Score
@@ -237,7 +254,7 @@ public final class Constants {
     // Processor Score
     public static final double ei_processor_score_power = 0.4;
     // Detection Threshholds
-    public static final double ei_coral_threshhold =  0.09;
+    public static final double ei_coral_threshhold = 0.09;
     public static final double ei_algae_threshhold = 0.12;
 
   }
