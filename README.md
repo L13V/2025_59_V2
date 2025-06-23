@@ -1,13 +1,10 @@
 # ICE/O Code (V2-Sigma Edition)
 
-- [ ] State machine
-- [ ] Machine Vision
-- [ ] No Ernesto
+- [x] State machine
+- [x] Machine Vision
 - [ ] AdvantageKit
 - [ ] Better PIDs and stuff
-- [ ] XboxCommand
-- [ ] Better Organization
+- [x] XboxCommand
+- [x] Better Organization
 
 # `Goon.`
-
-![Goon](https://i.ytimg.com/vi/WePNs-G7puA/hq720.jpg)
