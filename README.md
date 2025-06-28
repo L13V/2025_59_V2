@@ -3,7 +3,7 @@
 - [x] State machine
 - [x] Machine Vision
 - [ ] AdvantageKit
-- [ ] Better PIDs and stuff
+- [x] Better PIDs and stuff
 - [x] XboxCommand
 - [x] Better Organization
 
