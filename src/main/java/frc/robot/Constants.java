@@ -23,6 +23,7 @@ import swervelib.math.Matter;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final boolean SINGLE_CONTROLLER = false; 
 
   public static final double ROBOT_MASS = (110) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
@@ -47,7 +48,7 @@ public final class Constants {
   public static class OperatorConstants {
 
     // Joystick Deadband
-    public static final double DEADBAND = 0.035;
+    public static final double DEADBAND = 0.1;
     public static final double TURN_CONSTANT = 6;
   }
 
@@ -168,10 +169,10 @@ public final class Constants {
     public static final double L4_score_auto_height = 41.75;
     public static final double L4_score_auto_lower_height = 30.5;
     // L3
-    public static final double L3_height = 45.95;
+    public static final double L3_height = 44.95;
     public static final double algae_L3_height = 42.5;
     // L2
-    public static final double L2_height = 29.88;
+    public static final double L2_height = 29.88 - 0.5;
     public static final double algae_L2_height = 27;
     // L1
     public static final double L1_height = 19.1 + 1;
@@ -188,7 +189,7 @@ public final class Constants {
     public static final int teleop_coral_stow_angle = 35;
     public static final int algae_stow_angle = 66;
     // Floor
-    public static final int coral_floor_angle = 125;
+    public static final int coral_floor_angle = 127;
     public static final int algae_floor_angle = 160;
     // Barge
     public static final int barge_flick_angle = 25;
@@ -238,16 +239,17 @@ public final class Constants {
     // Intaking
     public static final double ei_coral_floor_intake_power = 0.5;
     public static final double ei_coral_coral_station_intake_power = 0.65;
-    public static final double ei_algae_intake_power = -0.4; // Takes ball from reef
+    // public static final double ei_algae_intake_power = -0.4; // Takes ball from reef
+    public static final double ei_algae_intake_power = 0; // Takes ball from reef
     public static final double ei_algae_idle_power = -0.125; // Takes ball from reef
     public static final double ei_algae_floor_intake_power = -1;
     public static final double ei_algae_floor_intake_top_roller_power = 0.9;
     // L1 Score
-    public static final double ei_L1_score_power = -0.16;
+    public static final double ei_L1_score_power = -0.2;
     // L2 and L3 Score
     public static final double ei_L2_L3_score_power = -0.25;
     // L4 Score
-    public static final double ei_L4_score_outtake_power = -0.075;
+    public static final double ei_L4_score_outtake_power = -0.04;
     // Barge Score
     public static final double ei_teleop_barge_score_power = 1; // Outtake ball
     public static final double ei_auto_barge_score_power = 0.75; // Outtake ball

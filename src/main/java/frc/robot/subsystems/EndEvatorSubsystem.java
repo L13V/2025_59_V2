@@ -4,7 +4,6 @@ import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -14,14 +13,13 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.EndeffectorIntakeConstants;
 import frc.robot.Constants.EndevatorConstants;
 
@@ -86,13 +84,17 @@ public class EndEvatorSubsystem extends SubsystemBase {
         FLICK,
         FLICK_SCORE,
         PROCESSOR,
-        PROCESSOR_SCORE
+        PROCESSOR_SCORE,
+        CORAL_INTAKE_ALGAE_OUTTAKE
     }
     /*
      * All state machine interaction and reading
      */
 
     public EndEvatorState state = EndEvatorState.STARTING;
+
+    public double overridespeed = 0.00;
+    public boolean overrided = false;
 
     /*
      * Required initialization crap
@@ -102,7 +104,8 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     }
 
-    // public EndEvatorSubsystem(CommandXboxController driver) { // Apply motor configs
+    // public EndEvatorSubsystem(CommandXboxController driver) { // Apply motor
+    // configs
     public EndEvatorSubsystem() { // Apply motor configs
 
         // this.driverXbox = driver;
@@ -188,6 +191,21 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return runOnce(() -> setState(setto));
     }
 
+    public Command SetToScoreCommand() {
+        return runOnce(() -> setToScoreCoral());
+    }
+
+    public Command SetToUnScoreCommand() {
+        return runOnce(() -> setToUnScore());
+    }
+
+    public Command intakeCoralOuttakeBallCommand() {
+        return runOnce(() -> intakeCoralOuttakeBall());
+    }
+    public Command resetOverrideCommand() {
+        return runOnce(() -> resetOverride());
+    }
+
     /**
      * Returns current elevator state.
      * 
@@ -262,6 +280,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public boolean canCoralRumble() {
         return (hasCoral() && state == EndEvatorState.CORAL_FLOOR_INTAKE);
     }
+
     public boolean canAlgaeRumble() {
         return (hasAlgae() && state == EndEvatorState.ALGAE_FLOOR_INTAKE);
     }
@@ -280,10 +299,17 @@ public class EndEvatorSubsystem extends SubsystemBase {
         left_motor_T.set(Power);
     }
 
-    static void setCoralRollersWithPower(double Power) {
-        right_motor_T.set(Power);
-        left_motor_T.set(Power);
-        top_motor_T.set(Power);
+    public void setCoralRollersWithPower(double Power) {
+        if (overrided) {
+            right_motor_T.set(overridespeed);
+            left_motor_T.set(overridespeed);
+            top_motor_T.set(overridespeed);
+        } else {
+            right_motor_T.set(Power);
+            left_motor_T.set(Power);
+            top_motor_T.set(Power);
+        }
+
     }
 
     static void setAlgaeRollerByPower(double flick) {
@@ -306,22 +332,89 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return top_motor_T.getStatorCurrent().refresh().getValueAsDouble();
     }
 
+    /* 
+     * Manual Roller Control Functions
+     */
+
+    public void intakeCoralOuttakeBall() {
+        overrided = true;
+        overridespeed = 0.125;
+    }
+
+    public void resetOverride() {
+        overrided = false;
+    }
+
+    /*
+     * Score Command
+     */
+    public void setToScoreCoral() {
+        DriverStation.reportWarning("hello", false);
+        EndEvatorState previousstate = getCurrentState();
+        switch (previousstate) {
+            case L4 -> {
+                state = EndEvatorState.L4_Score;
+            }
+            case L3 -> {
+                state = EndEvatorState.L3_Score;
+            }
+            case L2 -> {
+                state = EndEvatorState.L2_Score;
+            }
+            case L1 -> {
+                state = EndEvatorState.L1_Score;
+            }
+            case BARGE -> {
+                state = EndEvatorState.FLICK;
+            }
+            default -> {
+                overrided = true;
+                overridespeed = -0.125;
+            }
+        }
+    }
+
+    public void setToUnScore() {
+        DriverStation.reportWarning("hello", false);
+        EndEvatorState previousstate = getCurrentState();
+        switch (previousstate) {
+            case L4_Score -> {
+                state = EndEvatorState.L4;
+            }
+            case L3_Score -> {
+                state = EndEvatorState.L3;
+            }
+            case L2_Score -> {
+                state = EndEvatorState.L2;
+            }
+            case L1_Score -> {
+                state = EndEvatorState.L1;
+            }
+            default -> {
+                overrided = false;
+            }
+        }
+    }
+
     /*
      * Booleans for controlling binds.
      */
 
-    /* 
+    /*
      * Floor Intake Allower
      */
     public Boolean intakeAllower() {
-        return (state == EndEvatorState.STOW || state == EndEvatorState.ALGAE_FLOOR_INTAKE || state == EndEvatorState.CORAL_FLOOR_INTAKE || state == EndEvatorState.STARTING);
+        return (state == EndEvatorState.STOW || state == EndEvatorState.ALGAE_FLOOR_INTAKE
+                || state == EndEvatorState.CORAL_FLOOR_INTAKE || state == EndEvatorState.STARTING);
     }
+
     public BooleanSupplier intakeAllowerSupplier = () -> intakeAllower();
     /*
      * Coral
      */
     public BooleanSupplier hasCoralSupplier = () -> hasCoral();
     public BooleanSupplier readyToRaiseWithCoralSupplier = () -> readyToRaiseWithCoral();
+    public BooleanSupplier standardReadyToRaiseWithCoralSupplier = () -> standardReadyToRaiseWithCoral();
     public BooleanSupplier hasNoCoralSupplier = () -> !hasCoral();
     public BooleanSupplier notReadyToRaiseWithCoralSupplier = () -> !readyToRaiseWithCoral();
 
@@ -331,6 +424,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     public Boolean readyToRaiseWithCoral() {
         return coral_range.getIsDetected(true).getValue() && state != EndEvatorState.CORAL_FLOOR_INTAKE
+                && !algae_range.getIsDetected(true).getValue();
+    }
+    public Boolean standardReadyToRaiseWithCoral() {
+        return state != EndEvatorState.CORAL_FLOOR_INTAKE
                 && !algae_range.getIsDetected(true).getValue();
     }
 
@@ -515,6 +612,12 @@ public class EndEvatorSubsystem extends SubsystemBase {
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
 
             }
+            case CORAL_INTAKE_ALGAE_OUTTAKE -> {
+                setAlgaeRollerByPower(1); // TODO: FIX
+                setSideRollersWithPower(0);
+
+            }
+
             default -> {
                 moveElevator(0);
                 moveEndeffector(EndevatorConstants.teleop_coral_stow_angle, 0);

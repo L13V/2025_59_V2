@@ -21,7 +21,6 @@ import frc.robot.subsystems.BallIntakeSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEvatorSubsystem;
 import frc.robot.subsystems.BallIntakeSubsystem.BallIntakeState;
-import frc.robot.subsystems.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 import java.io.File;
 import frc.robot.commands.TeleOp_Climb_Command.*;
@@ -40,9 +39,10 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
 
         // Replace with CommandPS4Controller or CommandJoystick if needed
-        private final Boolean single_controller = false;
+
         final CommandXboxController driverXbox = new CommandXboxController(0);
         final CommandXboxController operatorXbox = new CommandXboxController(1);
+
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -126,7 +126,7 @@ public class RobotContainer {
                         // );
 
                 }
-                if (single_controller) {
+                if (Constants.SINGLE_CONTROLLER) {
                         /*
                          * L1
                          */
@@ -245,6 +245,119 @@ public class RobotContainer {
                         driverXbox.x().onTrue(drivebase.goSlow()).onFalse(drivebase.goFast());
 
                 } else {
+                        // #########################################
+                        // # Driver Controller #
+                        // #########################################
+                        driverXbox.back().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+                        driverXbox.rightBumper().onTrue(drivebase.goSlow()).onFalse(drivebase.goFast());
+                        /*
+                         * Ball Floor Intake
+                         */
+                        driverXbox.a().onTrue(m_ballintake.setTo(BallIntakeState.INTAKE))
+                                        .onFalse(m_ballintake.setTo(BallIntakeState.STOW));
+                        driverXbox.b().onTrue(m_ballintake.setTo(BallIntakeState.SCORE))
+                                        .onFalse(m_ballintake.setTo(BallIntakeState.STOW));
+
+                        /*
+                         * Processor height
+                         */
+                        driverXbox.x().and(m_endevator.readyToRaiseWithAlgaeSupplier)
+                                        .onTrue(m_endevator.setTo(EndEvatorState.PROCESSOR));
+                        /*
+                         * Barge Height
+                         */
+                        // go to barge: Not Floor intaking (Stowed/ other state), and has algae
+                        driverXbox.y().and(m_endevator.readyToRaiseWithAlgaeSupplier)
+                                        .and(m_endevator.isNotAt(EndEvatorState.FLICK))
+                                        .onTrue(m_endevator.setTo(EndEvatorState.BARGE));
+                        // Flick ball: Not Floor intaking (Stowed/ barge/ other state), has algae, at
+                        // barge state, at barge height
+                        // driverXbox.rightTrigger().and(m_endevator.readyToRaiseWithAlgaeSupplier)
+                        // .and(m_endevator.isAt(EndEvatorState.BARGE))
+                        // .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.barge_height))
+                        // .onTrue(m_endevator.setTo(EndEvatorState.FLICK));
+                        /*
+                         * Endeffector Floor Intake
+                         */
+                        // Coral floor intake: has no algae TODO: Verify that removing checks for
+                        // IntakeAllower and ReadyToRaise is okay.
+                        driverXbox.leftTrigger()
+                                        .and(m_endevator.hasNoAlgaeSupplier)
+                                        .onTrue(m_endevator.setTo(EndEvatorState.CORAL_FLOOR_INTAKE))
+                                        .onFalse(m_endevator.setTo(EndEvatorState.STOW));
+                        // Algae floor intake: has no coral TODO: Verify that removing checks for
+                        // IntakeAllower and ReadyToRaise is okay.
+                        driverXbox.rightTrigger()
+                                        .and(m_endevator.hasNoCoralSupplier)
+                                        .onTrue(m_endevator.setTo(EndEvatorState.ALGAE_FLOOR_INTAKE))
+                                        .onFalse(m_endevator.setTo(EndEvatorState.STOW));
+                        // #########################################
+                        // # Operator Controller #
+                        // #########################################
+                        /*
+                         * Stow
+                         */
+                        operatorXbox.back().onTrue(m_endevator.setTo(EndEvatorState.STOW));
+                        /*
+                         * Coral Intake and Algae Outtake (Only Rollers)
+                         */
+                        operatorXbox.x().onTrue(m_endevator.intakeCoralOuttakeBallCommand())
+                                        .onFalse(m_endevator.resetOverrideCommand());
+                        driverXbox.leftBumper().and(m_endevator.isNotAt(EndEvatorState.L4))
+                                        .and(m_endevator.isNotAt(EndEvatorState.L4_Score))
+                                        .onTrue(m_endevator.SetToScoreCommand())
+                                        .onFalse(m_endevator.SetToUnScoreCommand());
+                        driverXbox.leftBumper().and(m_endevator.isAt(EndEvatorState.L4))
+                                        .and(m_endevator.isNotAt(EndEvatorState.L4_Score))
+                                        .onTrue(m_endevator.setTo(EndEvatorState.L4_Score));
+                        operatorXbox.y().and(m_endevator.isNotAt(EndEvatorState.L4))
+                                        .and(m_endevator.isNotAt(EndEvatorState.L4_Score))
+                                        .onTrue(m_endevator.SetToScoreCommand())
+                                        .onFalse(m_endevator.SetToUnScoreCommand());
+                        operatorXbox.y().and(m_endevator.isAt(EndEvatorState.L4))
+                                        .and(m_endevator.isNotAt(EndEvatorState.L4_Score))
+                                        .onTrue(m_endevator.setTo(EndEvatorState.L4_Score));
+                        /*
+                         * Climb
+                         */
+                        operatorXbox.b().and(m_endevator.isAt(EndEvatorState.STOW))
+                                        .onTrue(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.CLIMB));
+                        operatorXbox.a().and(m_endevator.isAt(EndEvatorState.STOW))
+                                        .onTrue(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.DEPLOY));
+
+                        /*
+                         * Elevator Coral Heights
+                         */
+                        operatorXbox.povUp().and(m_endevator.standardReadyToRaiseWithCoralSupplier)
+                                        .and(driverXbox.leftTrigger().negate())
+                                        .onTrue(m_endevator.setTo(EndEvatorState.L1));
+                        operatorXbox.leftBumper().and(m_endevator.standardReadyToRaiseWithCoralSupplier)
+                                        .and(driverXbox.leftTrigger().negate())
+                                        .onTrue(m_endevator.setTo(EndEvatorState.L2));
+                        operatorXbox.rightBumper().and(m_endevator.standardReadyToRaiseWithCoralSupplier)
+                                        .and(driverXbox.leftTrigger().negate())
+                                        .onTrue(m_endevator.setTo(EndEvatorState.L3));
+                        operatorXbox.rightTrigger().and(m_endevator.standardReadyToRaiseWithCoralSupplier)
+                                        .and(driverXbox.leftTrigger().negate())
+                                        .onTrue(m_endevator.setTo(EndEvatorState.L4));
+                        /*
+                         * Elevator Algae Heights
+                         */
+                        operatorXbox.leftBumper().and(m_endevator.notReadyToRaiseWithAlgaeSupplier)
+                                        .and(operatorXbox.leftTrigger())
+                                        .onTrue(m_endevator.setTo(EndEvatorState.LOW_ALGAE_INTAKE));
+                        operatorXbox.rightBumper().and(m_endevator.notReadyToRaiseWithAlgaeSupplier)
+                                        .and(operatorXbox.leftTrigger())
+                                        .onTrue(m_endevator.setTo(EndEvatorState.HIGH_ALGAE_INTAKE));
+
+                        operatorXbox.rightTrigger().and(m_endevator.readyToRaiseWithAlgaeSupplier)
+                                        .and(operatorXbox.leftTrigger())
+                                        .and(m_endevator.isAt(EndEvatorState.BARGE))
+                                        .and(m_endevator.elevatorAtTargetPosition(EndevatorConstants.barge_height))
+                                        .onTrue(m_endevator.setTo(EndEvatorState.FLICK));
+                        operatorXbox.leftBumper().and(m_endevator.readyToRaiseWithCoralSupplier)
+                                        .and(operatorXbox.leftTrigger())
+                                        .onTrue(m_endevator.setTo(EndEvatorState.PROCESSOR));
 
                 }
         }

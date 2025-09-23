@@ -64,7 +64,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean visionDriveTest = false;
+  private final boolean visionDriveTest = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -118,7 +118,7 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+    // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
   }
 
   /**
@@ -132,7 +132,7 @@ public class SwerveSubsystem extends SubsystemBase {
         controllerCfg,
         Constants.MAX_SPEED,
         new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
-            Rotation2d.fromDegrees(0)));
+            Rotation2d.fromDegrees(180)));
   }
 
   /**
@@ -190,9 +190,15 @@ public class SwerveSubsystem extends SubsystemBase {
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic
               // drive trains
-              new PIDConstants(5.0, 0.0, 0.0),
+              // new PIDConstants(3.1, 0.024, 0.035),//0.1
+              new PIDConstants(2.4, 0.0, 0.0), // 0.1
+
+              // new PIDConstants(5, 0, 0),//0.1
+
               // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
+              new PIDConstants(5.45, 0.13, 0.1)// 0.1
+          // new PIDConstants(4.9, 0.13, 0)//0.1
+
           // Rotation PID constants
           ),
           config,
@@ -206,8 +212,9 @@ public class SwerveSubsystem extends SubsystemBase {
             var alliance = DriverStation.getAlliance();
             if (alliance.isPresent()) {
               return alliance.get() == DriverStation.Alliance.Red;
+            } else {
+              return false;
             }
-            return false;
           },
           this
       // Reference to this subsystem to set requirements
@@ -265,15 +272,16 @@ public class SwerveSubsystem extends SubsystemBase {
   public Command driveToPose(Pose2d pose) {
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        swerveDrive.getMaximumChassisVelocity(), 4.0,
-        swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+        1.5, 1.5,
+        350, Units.degreesToRadians(150.000));
 
     // Since AutoBuilder is configured, we can use it to build pathfinding commands
-    return AutoBuilder.pathfindToPose(
+    return AutoBuilder.pathfindToPoseFlipped(
         pose,
         constraints,
         edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
     );
+
   }
 
   /**
@@ -576,6 +584,11 @@ public class SwerveSubsystem extends SubsystemBase {
     return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
   }
 
+  private boolean isBlueAlliance() {
+    var alliance = DriverStation.getAlliance();
+    return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Blue : false;
+  }
+
   /**
    * This will zero (calibrate) the robot to assume the current position is facing
    * forward
@@ -604,17 +617,18 @@ public class SwerveSubsystem extends SubsystemBase {
   public void setDriveMultiplier(boolean slow) {
     if (slow == true) {
       drivemultiplier = DrivebaseConstants.slow_multiplier;
-    }
-    else {
+    } else {
       drivemultiplier = DrivebaseConstants.normal_multiplier;
     }
   }
+
   public Command goSlow() {
-    return this.runOnce(()-> setDriveMultiplier(true));
+    return this.runOnce(() -> setDriveMultiplier(true));
   }
+
   public Command goFast() {
-    return this.runOnce(()-> setDriveMultiplier(false));
-  }  
+    return this.runOnce(() -> setDriveMultiplier(false));
+  }
 
   /**
    * Gets the current yaw angle of the robot, as reported by the swerve pose
