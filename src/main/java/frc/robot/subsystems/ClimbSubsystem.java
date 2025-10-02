@@ -27,6 +27,7 @@ public class ClimbSubsystem extends SubsystemBase {
         STOW,
         DEPLOYED,
         CLIMB,
+        STOPPED,
     }
 
     /*
@@ -71,6 +72,9 @@ public class ClimbSubsystem extends SubsystemBase {
             case DEPLOYED -> {
                 moveClimbByPosition(ClimbConstants.climb_deployed_position);
 
+            }
+            case STOPPED -> {
+                stopClimb();
             }
             default -> {
             }
@@ -132,7 +136,9 @@ public class ClimbSubsystem extends SubsystemBase {
             climb_motor.setControl(climb_motor_PositionDutyCycle.withPosition(position));
         }
     }
-
+    public void stopClimb() {
+        climb_motor.stopMotor();
+    }
     /*
      * Various Functions used for retrieving positions of stuff.
      */

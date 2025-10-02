@@ -1,0 +1,120 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.22840600148015,
+        "y": 5.284086091977964
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.458322116802984,
+        "y": 5.599986763794044
+      },
+      "isLocked": false,
+      "linkedName": "IJ"
+    },
+    {
+      "anchor": {
+        "x": 5.9374200488437054,
+        "y": 5.6781983767768
+      },
+      "prevControl": {
+        "x": 5.476386916629573,
+        "y": 5.771572175706246
+      },
+      "nextControl": {
+        "x": 6.37049859945642,
+        "y": 5.590486265260299
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.13,
+        "y": 5.62523544520548
+      },
+      "prevControl": {
+        "x": 6.456621257943582,
+        "y": 5.553299864329322
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "B"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "BARRGR",
+      "minWaypointRelativePos": 1.7523809523809526,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.25,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.56951871657754,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 1.65,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Stow",
+      "waypointRelativePos": 0.6096256684491996,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stow"
+        }
+      }
+    },
+    {
+      "name": "Barge_Height",
+      "waypointRelativePos": 1.7673796791443905,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Barge_Height"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -120.43400000000001
+  },
+  "useDefaultConstraints": true
+}

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 // import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.EndevatorConstants;
@@ -23,6 +24,9 @@ import frc.robot.subsystems.EndEvatorSubsystem;
 import frc.robot.subsystems.BallIntakeSubsystem.BallIntakeState;
 import frc.robot.subsystems.EndEvatorSubsystem.EndEvatorState;
 import java.io.File;
+
+import com.pathplanner.lib.auto.NamedCommands;
+
 import frc.robot.commands.TeleOp_Climb_Command.*;
 // import frc.robot.Robot.OverallRobotState;
 
@@ -83,14 +87,21 @@ public class RobotContainer {
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
-         */
+         */ 
         public RobotContainer() {
                 // Configure the trigger bindings
                 configureBindings();
                 DriverStation.silenceJoystickConnectionWarning(true);
                 // m_climb.setDefaultCommand(new TeleOp_Climb_Command(m_ballintake, m_climb,
                 // climb_options.STARTING));
-                // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+                NamedCommands.registerCommand("Stow",m_endevator.new Stow());
+                NamedCommands.registerCommand("L4",m_endevator.new L4());
+                NamedCommands.registerCommand("L4_Score",m_endevator.new L4_Score());
+                NamedCommands.registerCommand("Low_Algae_Intake",m_endevator.new Low_Algae_Intake());
+                NamedCommands.registerCommand("High_Algae_Intake",m_endevator.new High_Algae_Intake());
+
+                NamedCommands.registerCommand("Barge_Height",m_endevator.new Barge_Height());
+                NamedCommands.registerCommand("Flick",m_endevator.new Flick());
         }
 
         /**
@@ -298,6 +309,7 @@ public class RobotContainer {
                          * Stow
                          */
                         operatorXbox.back().onTrue(m_endevator.setTo(EndEvatorState.STOW));
+                        operatorXbox.start().onTrue(m_endevator.setTo(EndEvatorState.ALGAE_STOW));
                         /*
                          * Coral Intake and Algae Outtake (Only Rollers)
                          */
@@ -321,9 +333,9 @@ public class RobotContainer {
                          * Climb
                          */
                         operatorXbox.b().and(m_endevator.isAt(EndEvatorState.STOW))
-                                        .onTrue(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.CLIMB));
+                                        .onTrue(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.CLIMB)).onFalse(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.STOPPED));
                         operatorXbox.a().and(m_endevator.isAt(EndEvatorState.STOW))
-                                        .onTrue(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.DEPLOY));
+                                        .onTrue(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.DEPLOY)).onFalse(new TeleOp_Climb_Command(m_ballintake, m_climb, climb_options.STOPPED));
 
                         /*
                          * Elevator Coral Heights
@@ -369,8 +381,8 @@ public class RobotContainer {
          */
         public Command getAutonomousCommand() {
                 // An example command will be run in autonomous
-                // return drivebase.getAutonomousCommand("New Auto");
-                return null;
+                return drivebase.getAutonomousCommand("Test Auto");
+                // return null;
         }
 
         public void setMotorBrake(boolean brake) {

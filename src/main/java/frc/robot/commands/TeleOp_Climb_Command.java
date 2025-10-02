@@ -12,7 +12,7 @@ public class TeleOp_Climb_Command extends Command{
     public enum climb_options {
         STARTING,
         DEPLOY,
-        CLIMB
+        CLIMB, STOPPED
     };
     public climb_options selectedOption = climb_options.STARTING;
     public TeleOp_Climb_Command(BallIntakeSubsystem ballintake, ClimbSubsystem climb, climb_options out) {
@@ -36,6 +36,9 @@ public class TeleOp_Climb_Command extends Command{
             case CLIMB -> {
                 climb_subsystem.state = ClimbState.CLIMB;
                 bi_subsystem.state = BallIntakeState.CLIMB;
+            }
+            case STOPPED -> {
+                climb_subsystem.state = ClimbState.STOPPED;;
             }
         }
     }

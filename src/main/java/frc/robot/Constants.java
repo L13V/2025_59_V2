@@ -55,7 +55,7 @@ public final class Constants {
   public static class ClimbConstants {
     public static final int climb_motor_id = 62;
     public static final double climb_climbing_limit = 1.55;
-    public static final double climb_deployed_position = 3.5;
+    public static final double climb_deployed_position = 3.25;
     public static final double climb_stow_position = 0.4 + 0.2;
     public static final double climb_backstop = 1.55;
     public static final double climb_power = -1;
@@ -155,13 +155,13 @@ public final class Constants {
      * Elevator heights
      */
     // Stow
-    public static final double coral_stow_height = 5;
+    public static final double coral_stow_height = 0;
     public static final double algae_stow_height = 9;
     // Floor
     public static final double coral_floor_pickup_height = 1;
     public static final double algae_floor_pickup_height = 11.5;
     // Barge
-    public static final double barge_height = 68.5;
+    public static final double barge_height = 68;
     // L4
     public static final double L4_height = 57.5;
     public static final double L4_auto_height = 56;
@@ -169,7 +169,7 @@ public final class Constants {
     public static final double L4_score_auto_height = 41.75;
     public static final double L4_score_auto_lower_height = 30.5;
     // L3
-    public static final double L3_height = 44.95;
+    public static final double L3_height = 45.5;
     public static final double algae_L3_height = 42.5;
     // L2
     public static final double L2_height = 29.88 - 0.5;
@@ -197,7 +197,7 @@ public final class Constants {
     public static final int auto_L4_angle = 35;
     public static final int teleop_L4_angle = 35;
     // L3
-    public static final int coral_L3_angle = 125;
+    public static final int coral_L3_angle = 129;
     public static final int algae_L3_angle = 125;
     // L2
     public static final int coral_L2_angle = 125;
@@ -240,8 +240,8 @@ public final class Constants {
     public static final double ei_coral_floor_intake_power = 0.5;
     public static final double ei_coral_coral_station_intake_power = 0.65;
     // public static final double ei_algae_intake_power = -0.4; // Takes ball from reef
-    public static final double ei_algae_intake_power = 0; // Takes ball from reef
-    public static final double ei_algae_idle_power = -0.125; // Takes ball from reef
+    public static final double ei_algae_intake_power = -0.4; // Takes ball from reef
+    public static final double ei_algae_idle_power = -0.2; // Takes ball from reef
     public static final double ei_algae_floor_intake_power = -1;
     public static final double ei_algae_floor_intake_top_roller_power = 0.9;
     // L1 Score

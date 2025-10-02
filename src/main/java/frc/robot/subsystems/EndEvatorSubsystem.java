@@ -67,6 +67,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     // Initialize ElevatorState Enum, and start at stow
     public enum EndEvatorState {
         STOW,
+        ALGAE_STOW,
         STARTING,
         L1,
         L1_Score,
@@ -91,7 +92,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * All state machine interaction and reading
      */
 
-    public EndEvatorState state = EndEvatorState.STARTING;
+    public static EndEvatorState state = EndEvatorState.STARTING;
 
     public double overridespeed = 0.00;
     public boolean overrided = false;
@@ -180,6 +181,122 @@ public class EndEvatorSubsystem extends SubsystemBase {
 
     }
 
+    /*
+     * Auto Commands
+     */
+
+    public class Stow extends Command {
+        public Stow() {
+            addRequirements(EndEvatorSubsystem.this);
+        }
+
+        @Override
+        public void execute() {
+            setState(EndEvatorState.STOW);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    }
+
+    public class L4 extends Command {
+        public L4() {
+            addRequirements(EndEvatorSubsystem.this);
+        }
+
+        @Override
+        public void execute() {
+            setState(EndEvatorState.L4);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    }
+
+    public class L4_Score extends Command {
+        public L4_Score() {
+            addRequirements(EndEvatorSubsystem.this);
+        }
+
+        @Override
+        public void execute() {
+            setState(EndEvatorState.L4_Score);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    }
+
+    public class High_Algae_Intake extends Command {
+        public High_Algae_Intake() {
+            addRequirements(EndEvatorSubsystem.this);
+        }
+
+        @Override
+        public void execute() {
+            setState(EndEvatorState.HIGH_ALGAE_INTAKE);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    }
+
+    public class Low_Algae_Intake extends Command {
+        public Low_Algae_Intake() {
+            addRequirements(EndEvatorSubsystem.this);
+        }
+
+        @Override
+        public void execute() {
+            setState(EndEvatorState.LOW_ALGAE_INTAKE);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    }
+
+    public class Barge_Height extends Command {
+        public Barge_Height() {
+            addRequirements(EndEvatorSubsystem.this);
+        }
+
+        @Override
+        public void execute() {
+            setState(EndEvatorState.BARGE);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    }
+
+    public class Flick extends Command {
+        public Flick() {
+            addRequirements(EndEvatorSubsystem.this);
+        }
+
+        @Override
+        public void execute() {
+            setState(EndEvatorState.FLICK);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    }
+
     /**
      * COMMAND for moving the elevator. Usually accessed by the controller, and
      * eventually sets the state of the state machine.
@@ -187,6 +304,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * @param setto
      * @return Command
      */
+
     public Command setTo(EndEvatorState setto) {
         return runOnce(() -> setState(setto));
     }
@@ -202,6 +320,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
     public Command intakeCoralOuttakeBallCommand() {
         return runOnce(() -> intakeCoralOuttakeBall());
     }
+
     public Command resetOverrideCommand() {
         return runOnce(() -> resetOverride());
     }
@@ -288,25 +407,38 @@ public class EndEvatorSubsystem extends SubsystemBase {
     /*
      * Coral Power function
      */
-    static void intakeCoralWithPower(double Power) {
-        right_motor_T.set(Power);
-        left_motor_T.set(Power - Math.abs(0.1));
-        top_motor_T.set((Power + 0.05));
+    public void intakeCoralWithPower(double Power) {
+        if (overrided) {
+            right_motor_T.set(overridespeed);
+            left_motor_T.set(overridespeed * 0.67);
+            top_motor_T.set(overridespeed + 0.05);
+        } else {
+            right_motor_T.set(Power);
+            left_motor_T.set(Power * 0.6);
+            top_motor_T.set((Power + 0.05));
+        }
+
     }
 
-    static void setSideRollersWithPower(double Power) {
-        right_motor_T.set(Power);
-        left_motor_T.set(Power);
+    public void setSideRollersWithPower(double Power) {
+        if (overrided) {
+            right_motor_T.set(overridespeed);
+            left_motor_T.set(overridespeed * 0.8);
+        } else {
+            right_motor_T.set(Power);
+            left_motor_T.set(Power * 0.8);
+        }
+
     }
 
     public void setCoralRollersWithPower(double Power) {
         if (overrided) {
             right_motor_T.set(overridespeed);
-            left_motor_T.set(overridespeed);
+            left_motor_T.set(overridespeed * 0.8);
             top_motor_T.set(overridespeed);
         } else {
             right_motor_T.set(Power);
-            left_motor_T.set(Power);
+            left_motor_T.set(Power * 0.8);
             top_motor_T.set(Power);
         }
 
@@ -332,7 +464,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return top_motor_T.getStatorCurrent().refresh().getValueAsDouble();
     }
 
-    /* 
+    /*
      * Manual Roller Control Functions
      */
 
@@ -349,7 +481,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
      * Score Command
      */
     public void setToScoreCoral() {
-        DriverStation.reportWarning("hello", false);
+        // DriverStation.reportWarning("hello", false);
         EndEvatorState previousstate = getCurrentState();
         switch (previousstate) {
             case L4 -> {
@@ -369,13 +501,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
             }
             default -> {
                 overrided = true;
-                overridespeed = -0.125;
+                overridespeed = -0.2;
             }
         }
     }
 
     public void setToUnScore() {
-        DriverStation.reportWarning("hello", false);
+        // DriverStation.reportWarning("hello", false);
         EndEvatorState previousstate = getCurrentState();
         switch (previousstate) {
             case L4_Score -> {
@@ -426,6 +558,7 @@ public class EndEvatorSubsystem extends SubsystemBase {
         return coral_range.getIsDetected(true).getValue() && state != EndEvatorState.CORAL_FLOOR_INTAKE
                 && !algae_range.getIsDetected(true).getValue();
     }
+
     public Boolean standardReadyToRaiseWithCoral() {
         return state != EndEvatorState.CORAL_FLOOR_INTAKE
                 && !algae_range.getIsDetected(true).getValue();
@@ -483,6 +616,13 @@ public class EndEvatorSubsystem extends SubsystemBase {
                     moveAntennaServo(EndevatorConstants.antenna_home);
                 }
 
+            }
+            case ALGAE_STOW -> {
+                setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_idle_power);
+                setSideRollersWithPower(0);
+                moveElevator(EndevatorConstants.algae_stow_height);
+                moveEndeffector(EndevatorConstants.algae_stow_angle, 0);
+                moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
             case L1 -> {
                 setCoralRollersWithPower(EndeffectorIntakeConstants.ei_idle_power);
@@ -554,7 +694,10 @@ public class EndEvatorSubsystem extends SubsystemBase {
             case BARGE -> {
                 setAlgaeRollerByPower(EndeffectorIntakeConstants.ei_algae_idle_power);
                 moveElevator(EndevatorConstants.barge_height);
-                moveEndeffector(EndevatorConstants.algae_stow_angle, 0); // TODO: VERIFY
+                if (getElevatorCurrentPosition() >= (getElevatorTargetPosition() - 8)) {
+                    moveEndeffector(EndevatorConstants.algae_stow_angle, 0); // TODO: VERIFY
+                }
+
                 moveAntennaServo(EndevatorConstants.antenna_reef_intake_limit);
             }
             case HIGH_ALGAE_INTAKE -> {
